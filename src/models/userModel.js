@@ -51,3 +51,19 @@ const findById = (id) => {
   const users = readUsers();
   return users.find((u) => u.id === id) || null;
 };
+/**
+ * Creates a new user record. Expects `passwordHash`, never a plain
+ * password - the controller is responsible for hashing beforehand.
+ */
+const createUser = ({ username, email, passwordHash, role }) => {
+  const users = readUsers();
+
+  const newUser = {
+    id: crypto.randomUUID(),
+    username: username.trim(),
+    email: email.trim().toLowerCase(),
+    password: passwordHash,
+    role: role || 'client',
+    createdAt: new Date().toISOString(),
+  };
+
