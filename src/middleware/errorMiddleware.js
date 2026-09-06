@@ -23,3 +23,23 @@ const notFound = (req, res, next) => {
  * - Anything else (a genuine bug/crash) is logged in full server-side
  *   for debugging, but the client only ever receives a generic message.
  */
+// eslint-disable-next-line no-unused-vars
+const globalErrorHandler = (err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const isOperational = err.isOperational === true;
+
+  // Full detail stays on the server console/logs only.
+  // eslint-disable-next-line no-console
+  console.error(`[ERROR] ${req.method} ${req.originalUrl} ->`, err.message);
+  if (config.nodeEnv === 'development' && !isOperational) {
+    // eslint-disable-next-line no-console
+    console.error(err.stack);
+  }
+
+  res.status(statusCode).json({
+    success: false,
+    message: isOperational ? err.message : 'Something went wrong. Please try again later.',
+  });
+};
+
+module.exports = { notFound, globalErrorHandler };
