@@ -43,6 +43,10 @@ const register = async (req, res, next) => {
  * @desc    Authenticate a user and issue a JWT
  * @access  Public
  */
+
+    // Security Note: We do not distinguish between "user not found" and "password incorrect" errors in the login route.
+    //  Distinguishing between the two lets an attacker
+    // enumerate valid email addresses on the platform.
 const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
