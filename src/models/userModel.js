@@ -26,3 +26,13 @@ const ensureStoreExists = () => {
     fs.writeFileSync(DATA_FILE, JSON.stringify([], null, 2), 'utf-8');
   }
 };
+const readUsers = () => {
+  ensureStoreExists();
+  const raw = fs.readFileSync(DATA_FILE, 'utf-8');
+  try {
+    return JSON.parse(raw);
+  } catch (err) {
+    // Corrupted store should never crash the API - fail safe to an empty list.
+    return [];
+  }
+};
