@@ -36,3 +36,18 @@ const readUsers = () => {
     return [];
   }
 };
+const writeUsers = (users) => {
+  ensureStoreExists();
+  fs.writeFileSync(DATA_FILE, JSON.stringify(users, null, 2), 'utf-8');
+};
+
+const findByEmail = (email) => {
+  const users = readUsers();
+  const normalised = email.trim().toLowerCase();
+  return users.find((u) => u.email.toLowerCase() === normalised) || null;
+};
+
+const findById = (id) => {
+  const users = readUsers();
+  return users.find((u) => u.id === id) || null;
+};
