@@ -79,3 +79,20 @@ const login = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * @route   GET /api/auth/profile
+ * @desc    Return the currently authenticated user's profile.
+ *          Demonstrates that a route is correctly protected by JWT
+ *          middleware and that the token payload maps back to a real user.
+ * @access  Private (requires valid JWT)
+ */
+const getProfile = (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: 'Profile retrieved successfully.',
+    data: { user: req.user },
+  });
+};
+
+module.exports = { register, login, getProfile };
