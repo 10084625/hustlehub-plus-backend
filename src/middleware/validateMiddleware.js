@@ -2,8 +2,16 @@ const { body, validationResult } = require('express-validator');
 const AppError = require('../utils/AppError');
 
 
-
-
+/**
+ * Validation & sanitisation rules for registration.
+ *
+ * All input is treated as untrusted. Each field is:
+ *   1. Trimmed/normalised (removes whitespace, escapes HTML) - mitigates
+ *      stored XSS / injection style payloads.
+ *   2. Constrained to an explicit allow-list of acceptable characters
+ *      and lengths - rejects malformed or malicious input outright
+ *      rather than trying to "clean" it.
+ */
 
 const registerRules = [
   body('username')
