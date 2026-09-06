@@ -44,3 +44,27 @@ const loginRules = [
   body('email').trim().isEmail().withMessage('A valid email address is required.').normalizeEmail(),
   body('password').notEmpty().withMessage('Password is required.'),
 ];
+
+
+/**
+ * Collects any validation errors raised by the rules above and converts
+ * them into a single, safe, client-facing 400 response - no internal
+ * detail (stack traces, library names, file paths) is ever exposed.
+ */
+
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    const messages = errors.array().map((e) => e.msg);
+    return next(new AppError(messages.join(' '), 400));
+  }
+
+  return next();
+};
+
+module.exports = {
+  registerRules,
+  loginRules,
+  handleValidationErrors,
+};
