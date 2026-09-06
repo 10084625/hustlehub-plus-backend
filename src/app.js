@@ -33,3 +33,14 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 if (config.nodeEnv !== 'test') {
   app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
 }
+
+
+
+// Health check 
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ success: true, message: 'HustleHub+ API is running.' });
+});
+
+// Routes
+app.use('/api/auth', authRoutes);
+
