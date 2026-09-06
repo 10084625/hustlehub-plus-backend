@@ -32,3 +32,17 @@ const config = {
     origin: (process.env.CORS_ORIGIN || 'https://localhost:3000').split(','),
   },
 };
+
+// Fail fast: never allow the app to boot in production with default/weak secrets.
+if (config.nodeEnv === 'production') {
+  requiredInProduction.forEach((key) => {
+    if (!process.env[key]) {
+      
+      console.error(`FATAL: Missing required environment variable "${key}" in production.`);
+      process.exit(1);
+    }
+  });
+}
+
+module.exports = config;
+
