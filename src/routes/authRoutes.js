@@ -8,3 +8,9 @@ const router = express.Router();
 
 router.post('/register', registerRules, handleValidationErrors, register);
 router.post('/login', loginRules, handleValidationErrors, login);
+
+
+
+router.get('/profile', protect, getProfile);
+
+module.exports = router;
