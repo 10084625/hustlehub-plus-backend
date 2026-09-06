@@ -14,3 +14,16 @@ const config = require('../config/env');
  *  - The signing secret is loaded from environment configuration and is
  *    never hard-coded in source.
  */
+const generateToken = (user) => {
+  const payload = {
+    id: user.id,
+    role: user.role,
+  };
+
+  return jwt.sign(payload, config.jwt.secret, {
+    expiresIn: config.jwt.expiresIn,
+    issuer: 'hustlehub-plus-api',
+  });
+};
+
+module.exports = generateToken;
