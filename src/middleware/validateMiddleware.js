@@ -38,3 +38,9 @@ const registerRules = [
     .isIn(['client', 'freelancer'])
     .withMessage('Role must be either "client" or "freelancer".'),
 ];
+
+
+const loginRules = [
+  body('email').trim().isEmail().withMessage('A valid email address is required.').normalizeEmail(),
+  body('password').notEmpty().withMessage('Password is required.'),
+];
