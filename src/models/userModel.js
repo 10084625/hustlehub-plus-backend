@@ -66,4 +66,26 @@ const createUser = ({ username, email, passwordHash, role }) => {
     role: role || 'client',
     createdAt: new Date().toISOString(),
   };
+users.push(newUser);
+  writeUsers(users);
+
+  return newUser;
+};
+
+/**
+ * Returns a user object with the password field stripped out.
+ * Use this any time a user object is sent in an API response.
+ */
+const toSafeUser = (user) => {
+  if (!user) return null;
+  const { password, ...safeUser } = user;
+  return safeUser;
+};
+
+module.exports = {
+  findByEmail,
+  findById,
+  createUser,
+  toSafeUser,
+};
 
