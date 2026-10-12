@@ -45,3 +45,14 @@ const listGigs = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * GET /api/gigs/mine - freelancer only. Own gigs including paused ones.
+ */
+const listMyGigs = async (req, res, next) => {
+  try {
+    const gigs = await Gig.find({ freelancer: req.user.id }).sort({ createdAt: -1 });
+    return res.status(200).json({ success: true, message: 'Your gigs retrieved successfully.', data: { gigs } });
+  } catch (err) {
+    return next(err);
+  }
+};
