@@ -37,3 +37,27 @@ const register = async (req, res, next) => {
   }
 };
 
+/**
+ * POST /api/auth/login - Public
+ * Same error message for "no such user", "wrong password" and "deactivated",
+ * so the endpoint cannot be used to discover which emails are registered.
+ */
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.validated.body;
+    const invalid = new AppError('Invalid email or password.', 401);
+
+    const user = await User.findOne({ email }).select('+password');
+    const passwordMatches = await bcrypt.compare(password, user ? user.password : DUMMY_HASH);
+
+    if (!user || !passwordMatches || !user.isActive) return next(invalid);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Login successful.',
+      data: { user: user.toJSON(), token: generateToken(user) },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
