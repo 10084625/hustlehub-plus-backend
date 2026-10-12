@@ -112,3 +112,22 @@ const getBooking = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * PATCH /api/bookings/:id/complete - the freelancer who received the
+ * booking marks the work as delivered.
+ */
+const completeBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findOneAndUpdate(
+      { _id: req.validated.params.id, freelancer: req.user.id, status: 'confirmed' },
+      { $set: { status: 'completed' } },
+      { new: true }
+    );
+    if (!booking) return next(notFound('Open booking'));
+    return res.status(200).json({ success: true, message: 'Booking marked as completed.', data: { booking } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { createBooking, listMyBookings, listAllBookings, getBooking, completeBooking };
