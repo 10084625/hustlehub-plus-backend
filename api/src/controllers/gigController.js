@@ -81,3 +81,22 @@ const createGig = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * PATCH /api/gigs/:id - owning freelancer only.
+ * The ownership check is part of the database query itself, so there is no
+ * window where another user's gig is loaded and then modified.
+ */
+const updateGig = async (req, res, next) => {
+  try {
+    const gig = await Gig.findOneAndUpdate(
+      { _id: req.validated.params.id, freelancer: req.user.id },
+      { $set: req.validated.body },
+      { new: true, runValidators: true }
+    );
+    if (!gig) return next(notFound('Gig'));
+    return res.status(200).json({ success: true, message: 'Gig updated successfully.', data: { gig } });
+  } catch (err) {
+    return next(err);
+  }
+};
