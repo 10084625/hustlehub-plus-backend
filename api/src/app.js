@@ -39,3 +39,36 @@ app.use(
 
 // 3. Body parsing with size limits (blunts oversized-payload DoS)
 app.use(express.json({ limit: '10kb' }));
+
+// 4. Input sanitisation
+//    - mongoSanitize removes keys starting with "$" or containing "." from
+//      body, query and params, blocking NoSQL operator injection
+//      such as { "email": { "$gt": "" } }.
+//    - hpp stops HTTP parameter pollution (?category=a&category=b).
+app.use(mongoSanitize());
+app.use(hpp());
+
+// 5. Global rate limit across the whole API
+app.use('/api', globalLimiter);
+
+// 6. Request logging (never logs bodies, so passwords/tokens stay out of logs)
+if (config.nodeEnv !== 'test') {
+  app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
+}
+
+// Routes
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ success: true, message: 'HustleHub+ API is running.' });
+});
+app.use('/api/auth', authRoutes);
+app.use('/api/gigs', gigRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/income', incomeRoutes);
+app.use('/api/admin', adminRoutes);
+
+// 404 + single, safe error exit point
+app.use(notFound);
+app.use(globalErrorHandler);
+
+module.exports = app;
