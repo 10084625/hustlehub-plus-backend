@@ -29,3 +29,58 @@ const readSession = () => {
     return null;
   }
 };
+
+export function AuthProvider({ children }) {
+  const [session, setSession] = useState(() => {
+    const s = readSession();
+    setAuthToken(s?.token ?? null);
+    return s;
+  });
+  const [notice, setNotice] = useState('');
+  const timer = useRef(null);
+
+  const logout = useCallback((message = '') => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    setAuthToken(null);
+    setSession(null);
+    setNotice(typeof message === 'string' ? message : '');
+  }, []);
+
+  const startSession = useCallback(({ user, token }) => {
+    const s = { user: { id: user.id, username: user.username, role: user.role }, token };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+    setAuthToken(token);
+    setNotice('');
+    setSession(s);
+    return s.user;
+  }, []);
+
+  // Auto-logout exactly when the token expires.
+  useEffect(() => {
+    clearTimeout(timer.current);
+    if (!session) return undefined;
+    const ms = (decodeTokenExpiry(session.token) ?? 0) - Date.now();
+    timer.current = setTimeout(() => logout('Your session expired. Please sign in again.'), Math.max(0, ms));
+    return () => clearTimeout(timer.current);
+  }, [session, logout]);
+
+  useEffect(() => {
+    setUnauthorisedHandler(() => logout('Please sign in again to continue.'));
+  }, [logout]);
+
+  const login = useCallback(async (credentials) => startSession(await api.login(credentials)), [startSession]);
+  const register = useCallback(async (details) => startSession(await api.register(details)), [startSession]);
+  const clearNotice = useCallback(() => setNotice(''), []);
+
+  const value = useMemo(
+    () => ({ user: session?.user ?? null, isAuthenticated: Boolean(session), login, register, logout, notice, clearNotice }),
+    [session, login, register, logout, notice, clearNotice]
+  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
+  return ctx;
+};
