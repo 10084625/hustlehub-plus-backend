@@ -57,4 +57,22 @@ export async function request(path, { method = 'GET', body } = {}) {
   } catch {
     payload = null;
   }
+
+  if (!res.ok) {
+    if (res.status === 401 && authToken) onUnauthorised();
+    // Messages from our API are written to be safe for users. Server errors
+    // always fall back to a generic message.
+    const message = res.status >= 500 ? FRIENDLY[500] : payload?.message || FRIENDLY[res.status] || 'Request failed.';
+    throw new ApiError(message, res.status);
+  }
+  return payload?.data ?? {};
 }
+
+const q = (params) => {
+  const usp = new URLSearchParams();
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && v !== '') usp.set(k, v);
+  });
+  const s = usp.toString();
+  return s ? `?${s}` : '';
+};
