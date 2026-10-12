@@ -1,0 +1,51 @@
+PASS tests/app.test.js
+  API security behaviour (no database needed)
+    ✓ health check responds with the standard envelope (23 ms)
+    ✓ security headers and CSP are set (5 ms)
+    ✓ unknown route returns a safe 404 without echoing the path (3 ms)
+    ✓ get /api/gigs requires a JWT (4 ms)
+    ✓ post /api/gigs requires a JWT (3 ms)
+    ✓ post /api/bookings requires a JWT (3 ms)
+    ✓ get /api/transactions/mine requires a JWT (2 ms)
+    ✓ get /api/income/summary requires a JWT (3 ms)
+    ✓ get /api/admin/users requires a JWT (4 ms)
+    ✓ a garbage token is rejected (3 ms)
+    ✓ register rejects unexpected fields before touching the database (13 ms)
+    ✓ register rejects self-assigned admin role (9 ms)
+    ✓ NoSQL operator injection in login is neutralised (3 ms)
+    ✓ malformed JSON gets a controlled 400 (4 ms)
+    ✓ oversized body is refused (7 ms)
+
+PASS tests/middleware.test.js
+  authorize (RBAC)
+    ✓ allows a permitted role (1 ms)
+    ✓ blocks a role that is not permitted with 403
+    ✓ blocks a request with no user with 401
+  allowOnlyFields (Part 1 feedback fix)
+    ✓ accepts only documented fields
+    ✓ rejects an unexpected field such as role
+    ✓ rejects unexpected query parameters
+    ✓ rejects a body that is an array
+  stripHtml (XSS sanitisation)
+    ✓ removes script tags and their content (1 ms)
+    ✓ removes event-handler payloads (1 ms)
+    ✓ leaves plain text alone
+  isOwnerOrAdmin (ownership)
+    ✓ owner is allowed
+    ✓ someone else is refused
+    ✓ admin is allowed (1 ms)
+
+PASS tests/token.test.js
+  JWT generation and verification (Part 1 feedback fix)
+    ✓ a token we generate verifies and carries id + role only (4 ms)
+    ✓ a token from a different issuer is rejected (7 ms)
+    ✓ a token for a different audience is rejected (1 ms)
+    ✓ a token signed with another algorithm is rejected (1 ms)
+    ✓ an unsigned "alg: none" token is rejected (1 ms)
+    ✓ a token signed with the wrong secret is rejected (1 ms)
+
+Test Suites: 3 passed, 3 total
+Tests:       34 passed, 34 total
+Snapshots:   0 total
+Time:        1.484 s, estimated 2 s
+Ran all test suites.

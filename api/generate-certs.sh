@@ -2,7 +2,7 @@
 # Generates a self-signed SSL certificate for local development.
 # Requires OpenSSL (pre-installed on macOS/Linux; on Windows use
 # Git Bash, WSL, or install OpenSSL separately).
-# Usage:  npm run generate-certs or: bash generate-certs.sh
+# Usage: npm run generate-certs   (or: bash generate-certs.sh)
 
 
 set -e
@@ -19,7 +19,8 @@ openssl req -x509 -nodes -days 365 \
   -newkey rsa:2048 \
   -keyout "$CERT_DIR/key.pem" \
   -out "$CERT_DIR/cert.pem" \
-  -subj "/C=ZA/ST=KwaZulu-Natal/L=Durban/O=HustleHubPlus/OU=Dev/CN=localhost"
+  -subj "/C=ZA/ST=KwaZulu-Natal/L=Durban/O=HustleHubPlus/OU=Dev/CN=localhost" \
+  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 
 echo ""
 echo "Self-signed certificate generated:"
