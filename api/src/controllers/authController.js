@@ -1,3 +1,6 @@
+// References: [9] OWASP Authentication Cheat Sheet (same error message and
+// equal response time for wrong email or password), [10] OWASP Password
+// Storage Cheat Sheet (bcrypt work factor), [11] bcryptjs. See README section 16.
 const bcrypt = require('bcryptjs');
 const { trusted } = require('mongoose');
 const config = require('../config/env');
