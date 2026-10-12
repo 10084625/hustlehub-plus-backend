@@ -21,3 +21,23 @@ describe('authorize (RBAC)', () => {
     expect(err.statusCode).toBe(401);
   });
 });
+
+describe('allowOnlyFields (Part 1 feedback fix)', () => {
+  const mw = allowOnlyFields({ body: ['email', 'password'] });
+  test('accepts only documented fields', async () => {
+    expect(await run(mw, { body: { email: 'a@b.co', password: 'x' }, query: {} })).toBeUndefined();
+  });
+  test('rejects an unexpected field such as role', async () => {
+    const err = await run(mw, { body: { email: 'a@b.co', password: 'x', role: 'admin' }, query: {} });
+    expect(err.statusCode).toBe(400);
+    expect(err.message).toMatch(/unexpected field/);
+  });
+  test('rejects unexpected query parameters', async () => {
+    const err = await run(mw, { body: {}, query: { debug: 'true' } });
+    expect(err.statusCode).toBe(400);
+  });
+  test('rejects a body that is an array', async () => {
+    const err = await run(mw, { body: [], query: {} });
+    expect(err.statusCode).toBe(400);
+  });
+});
