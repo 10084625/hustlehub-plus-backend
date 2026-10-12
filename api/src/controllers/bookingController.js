@@ -62,3 +62,21 @@ const createBooking = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/bookings/mine - client sees bookings they made; freelancer sees
+ * bookings made on their gigs. The filter is built from the token's user id,
+ * so there is no way to ask for someone else's bookings.
+ */
+const listMyBookings = async (req, res, next) => {
+  try {
+    const filter = req.user.role === 'freelancer' ? { freelancer: req.user.id } : { client: req.user.id };
+    const bookings = await Booking.find(filter)
+      .sort({ createdAt: -1 })
+      .populate('client', PARTY_FIELDS)
+      .populate('freelancer', PARTY_FIELDS);
+    return res.status(200).json({ success: true, message: 'Bookings retrieved successfully.', data: { bookings } });
+  } catch (err) {
+    return next(err);
+  }
+};
