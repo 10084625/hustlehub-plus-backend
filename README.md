@@ -8,7 +8,6 @@
 ![Vitest](https://img.shields.io/badge/Frontend%20tests-27%20passing-success)
 ![Jest](https://img.shields.io/badge/Backend%20unit%20tests-34%20passing-success)
 
-
 > **Module:** INSY7314, Information Systems 3D / APDS7311, Application Development Security
 > **POE Part 2:** Secure Stack (full-stack MERN application)
 
@@ -54,6 +53,8 @@ Part 2 extends it into a full MERN stack:
 | **R**eact | React 18 + Vite + React Router | User interface for all three roles |
 | **N**ode | Node.js 18+ | Runtime for the API and tooling |
 
+---
+
 ## 2. What Changed in Part 2
 
 | Area | Part 1 | Part 2 |
@@ -69,6 +70,8 @@ Part 2 extends it into a full MERN stack:
 | Frontend | None | **React app** served over HTTPS with client-side validation and role-aware navigation |
 | Testing | 13 Postman requests | **103 Newman requests / 235 assertions**, **34 Jest backend unit tests**, **27 Vitest frontend tests** |
 | Repo layout | Backend at root | **`api/` and `client/` folders** (ready for one Dockerfile each in Part 3) |
+
+---
 
 ## 3. Part 1 Feedback and How It Was Addressed
 
@@ -95,6 +98,8 @@ Part 1 scored 96/100. The marker raised two points, and both are fixed and cover
 - `npm run generate-certs` called `generate-certs.sh`, but the file was named `generate-cert.sh`. The script was renamed, and it now adds a `subjectAltName` so modern browsers accept the certificate for `localhost`.
 - The architecture diagram's Mermaid block was missing its opening fence and did not render. It is replaced in [section 5](#5-architecture).
 - The 404 handler echoed the requested URL back to the client (a reflected-input risk). It now returns a fixed message.
+
+---
 
 ## 4. Features
 
@@ -125,22 +130,29 @@ Part 1 scored 96/100. The marker raised two points, and both are fixed and cover
 
 Transactions are **read-only**: there is deliberately no endpoint to create, edit or delete one directly.
 
+---
+
 ## 5. Architecture
-<img width="962" height="1535" alt="MERN + Hustle Hub Part 2  drawio" src="https://github.com/user-attachments/assets/6b496d7d-9520-4b05-8cdb-9d615260de4f" />
 
+<p align="center">
+  <img width="720" alt="HustleHub+ Part 2 MERN architecture diagram" src="https://github.com/user-attachments/assets/6b496d7d-9520-4b05-8cdb-9d615260de4f" />
+</p>
+<p align="center"><em>Figure 1: HustleHub+ Part 2 architecture (MERN stack with security layers and trust boundaries)</em></p>
 
-```
+### 5.1 Trust boundaries
 
-**Trust boundaries**
+| Boundary | How it is protected |
+|---|---|
+| **Browser to servers** | Everything travels over HTTPS. The React app only ever talks to its own origin (`/api` is proxied), so its CSP can be `connect-src 'self'`. |
+| **Edge of the API** | Headers, size limits, sanitisation and rate limits apply to every request before any route code runs. |
+| **Authentication** | `protect()` sits in front of every route except `register`, `login` and `health`. |
+| **Authorisation** | `authorize()` checks the role. Controllers then add **ownership** to the database query itself (e.g. `{ _id, freelancer: req.user.id }`), so another user's record is never loaded at all. |
+| **Data** | Password hashes have `select: false` and are stripped by `toJSON`. Other users are only ever exposed by `username`. |
+| **Errors** | One global handler is the only way an error becomes a response. |
 
-- **Browser to servers:** everything travels over HTTPS. The React app only ever talks to its own origin (`/api` is proxied), so its CSP can be `connect-src 'self'`.
-- **Edge of the API:** headers, size limits, sanitisation and rate limits apply to every request before any route code runs.
-- **Authentication boundary:** `protect()` sits in front of every route except `register`, `login` and `health`.
-- **Authorisation boundary:** `authorize()` checks the role; controllers then add **ownership** to the database query itself (e.g. `{ _id, freelancer: req.user.id }`), so another user's record is never loaded at all.
-- **Data boundary:** password hashes have `select: false` and are stripped by `toJSON`; other users are only ever exposed by `username`.
-- **Error boundary:** one global handler is the only way an error becomes a response.
+> The Part 1 diagram is kept for comparison at `docs/architecture/part1-architecture.png`.
 
-The Part 1 diagram is kept for comparison at `docs/architecture/part1-architecture.png`.
+---
 
 ## 6. Project Structure
 
@@ -161,7 +173,7 @@ The Part 1 diagram is kept for comparison at `docs/architecture/part1-architectu
 │   │   │   ├── rateLimiters.js       # auth, auth-per-IP, booking, global limiters
 │   │   │   ├── securityHeaders.js    # Helmet + CSP + no-store
 │   │   │   └── errorMiddleware.js    # 404 + global error handler
-│   │   ├── validators/               # allow-list + express-validator rules per resource
+│   │   ├── validators/               # Allow-list + express-validator rules per resource
 │   │   └── utils/                    # AppError, JWT helpers, HTML stripping, ownership
 │   ├── scripts/seedAdmin.js          # The only way to create an admin
 │   ├── tests/                        # Jest unit/HTTP tests (no DB needed)
@@ -170,10 +182,10 @@ The Part 1 diagram is kept for comparison at `docs/architecture/part1-architectu
 ├── client/                           # React frontend
 │   ├── src/
 │   │   ├── api/client.js             # fetch wrapper: token, safe errors, 401 handling
-│   │   ├── context/AuthContext.jsx   # session, auto-logout on expiry
+│   │   ├── context/AuthContext.jsx   # Session, auto-logout on expiry
 │   │   ├── components/               # Layout, ProtectedRoute, GigCard, GigForm, Receipt...
 │   │   ├── pages/                    # Login, Register, Browse, GigDetail, Bookings, ...
-│   │   ├── utils/                    # validation, formatting, token expiry
+│   │   ├── utils/                    # Validation, formatting, token expiry
 │   │   ├── styles/app.css
 │   │   └── test/                     # Vitest + React Testing Library tests
 │   ├── vite.config.js                # HTTPS, /api proxy, CSP + security headers
@@ -181,14 +193,16 @@ The Part 1 diagram is kept for comparison at `docs/architecture/part1-architectu
 ├── postman/
 │   ├── HustleHub-Part2.postman_collection.json   # 87 requests in 7 folders
 │   ├── HustleHub-local.postman_environment.json
-│   ├── HustleHub-Part1.postman_collection.json   # kept for history
-│   └── build_collection.py                       # generates the Part 2 collection
+│   ├── HustleHub-Part1.postman_collection.json   # Kept for history
+│   └── build_collection.py                       # Generates the Part 2 collection
 ├── docs/
 │   ├── architecture/part1-architecture.png
 │   ├── evidence/                     # Newman HTML/XML, test logs (see section 12)
 │   └── screenshots/
 └── README.md
 ```
+
+---
 
 ## 7. Getting Started
 
@@ -249,9 +263,7 @@ npm run build
 npm run preview
 ```
 
-Open **https://localhost:3000**. The certificate is self-signed, so the browser shows a warning
-the first time; choose *Advanced → Proceed to localhost*. Requests to `/api` are forwarded to the
-API at `https://localhost:5000`.
+Open **https://localhost:3000**. The certificate is self-signed, so the browser shows a warning the first time; choose *Advanced → Proceed to localhost*. Requests to `/api` are forwarded to the API at `https://localhost:5000`.
 
 ### 7.4 Accounts for a quick demo
 
@@ -266,7 +278,7 @@ API at `https://localhost:5000`.
 ### 7.5 Environment variables (`api/.env`)
 
 | Variable | Required | Description | Example |
-|---|---|---|---|
+|---|:---:|---|---|
 | `JWT_SECRET` | **Yes** | Signing secret, at least 32 characters | *(random 64-byte hex)* |
 | `MONGO_URI` | **Yes** | MongoDB connection string | `mongodb://127.0.0.1:27017/hustlehub` |
 | `PORT` | No | API port | `5000` |
@@ -276,12 +288,14 @@ API at `https://localhost:5000`.
 | `BCRYPT_SALT_ROUNDS` | No | bcrypt cost factor | `12` |
 | `SSL_KEY_PATH` / `SSL_CERT_PATH` | No | TLS key and certificate | `./certs/key.pem` |
 | `CORS_ORIGIN` | No | Allowed browser origin(s), comma separated | `https://localhost:3000` |
-| `RATE_LIMIT_*` | No | Rate-limit sizes and windows (see [11.5](#115-rate-limiting)) | `10` / `15` |
-| `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | For seeding | Admin account created by `seed:admin` | |
+| `RATE_LIMIT_*` | No | Rate-limit sizes and windows (see [11.5](#115-rate-limiting--a07-a04)) | `10` / `15` |
+| `ADMIN_USERNAME` / `ADMIN_EMAIL` / `ADMIN_PASSWORD` | For seeding | Admin account created by `seed:admin` | *(see `.env.example`)* |
+
+---
 
 ## 8. Roles and Permissions (RBAC)
 
-✅ allowed · ❌ refused (**403**) · 🔒 only their own records (someone else's returns **404**) · 👁 own plus public
+**Key:** ✅ allowed · ❌ refused (**403**) · 🔒 only their own records (someone else's returns **404**)
 
 | Action | Client | Freelancer | Admin |
 |---|:---:|:---:|:---:|
@@ -300,22 +314,24 @@ API at `https://localhost:5000`.
 | All bookings / all transactions | ❌ | ❌ | ✅ |
 | User list, suspend/reactivate, stats | ❌ | ❌ | ✅ |
 
-**Why someone else's record returns 404, not 403:** a 403 would confirm that the id exists. Returning
-"not found" means an attacker cannot use the API to map out other users' records by guessing ids
-(an IDOR probing technique) [2].
+**Why someone else's record returns 404, not 403:** a 403 would confirm that the id exists. Returning "not found" means an attacker cannot use the API to map out other users' records by guessing ids (an IDOR probing technique) [2].
 
-**Where it is enforced:** the role is checked by `authorize()` on the route; the ownership rule is
-part of the MongoDB filter in the controller. The React app hides links a role cannot use, but that
-is only for convenience. The API is the real boundary, which the Newman suite checks by calling
-every protected endpoint with the wrong role and the wrong owner.
+**Where it is enforced:** the role is checked by `authorize()` on the route; the ownership rule is part of the MongoDB filter in the controller. The React app hides links a role cannot use, but that is only for convenience. The API is the real boundary, which the Newman suite checks by calling every protected endpoint with the wrong role and the wrong owner.
+
+---
 
 ## 9. API Reference
 
-Base URL: `https://localhost:5000/api`. Every response uses the same envelope:
-`{ "success": true|false, "message": "...", "data": { ... } }`.
+**Base URL:** `https://localhost:5000/api`
+
+Every response uses the same envelope:
+
+```json
+{ "success": true, "message": "...", "data": { } }
+```
 
 | Method | Endpoint | Auth | Roles | Body / query (only these fields are accepted) | Rate limit |
-|---|---|---|---|---|---|
+|---|---|:---:|---|---|---|
 | GET | `/health` | No | | | global |
 | POST | `/auth/register` | No | | `username, email, password, role?` (`client`/`freelancer`) | auth |
 | POST | `/auth/login` | No | | `email, password` | auth |
@@ -324,7 +340,7 @@ Base URL: `https://localhost:5000/api`. Every response uses the same envelope:
 | GET | `/gigs/mine` | JWT | freelancer | | global |
 | GET | `/gigs/:id` | JWT | any | | global |
 | POST | `/gigs` | JWT | freelancer | `title, description, category, price, deliveryDays, isActive?` | global |
-| PATCH | `/gigs/:id` | JWT | freelancer (owner) | any of the gig fields (at least one) | global |
+| PATCH | `/gigs/:id` | JWT | freelancer (owner) | Any of the gig fields (at least one) | global |
 | DELETE | `/gigs/:id` | JWT | freelancer (owner), admin | | global |
 | POST | `/bookings` | JWT | client | `gigId, notes?` | **booking** |
 | GET | `/bookings/mine` | JWT | client, freelancer | | global |
@@ -341,45 +357,73 @@ Base URL: `https://localhost:5000/api`. Every response uses the same envelope:
 <details>
 <summary><strong>Example: POST /bookings</strong></summary>
 
+<br>
+
 **Request** (`Authorization: Bearer <client token>`)
+
 ```json
 { "gigId": "6ac735549e27884281dd7d45", "notes": "Please use blue and gold." }
 ```
 
 **201 Created**
+
 ```json
 {
   "success": true,
   "message": "Booking confirmed. Payment simulated successfully.",
   "data": {
-    "booking": { "id": "…", "gigTitle": "Logo design for small businesses", "amount": 900, "status": "confirmed", "client": "…", "freelancer": "…" },
-    "transaction": { "reference": "HH-MUZ58YF0-335ABD", "amount": 900, "platformFee": 90, "freelancerEarnings": 810, "currency": "ZAR", "paymentMethod": "simulated", "status": "completed" }
+    "booking": {
+      "id": "…",
+      "gigTitle": "Logo design for small businesses",
+      "amount": 900,
+      "status": "confirmed",
+      "client": "…",
+      "freelancer": "…"
+    },
+    "transaction": {
+      "reference": "HH-MUZ58YF0-335ABD",
+      "amount": 900,
+      "platformFee": 90,
+      "freelancerEarnings": 810,
+      "currency": "ZAR",
+      "paymentMethod": "simulated",
+      "status": "completed"
+    }
   }
 }
 ```
 
-**Errors:** `400` invalid/unexpected fields (e.g. sending `amount`), `401` no/invalid token,
-`403` not a client, `404` gig missing or paused, `429` too many bookings.
+**Errors:** `400` invalid/unexpected fields (e.g. sending `amount`), `401` no/invalid token, `403` not a client, `404` gig missing or paused, `429` too many bookings.
+
 </details>
 
 <details>
 <summary><strong>Example: GET /income/summary</strong></summary>
+
+<br>
 
 ```json
 {
   "success": true,
   "message": "Income summary retrieved successfully.",
   "data": {
-    "currency": "ZAR", "transactionCount": 2,
-    "grossIncome": 3700, "platformFees": 370, "netIncome": 3330, "averagePerBooking": 1665,
+    "currency": "ZAR",
+    "transactionCount": 2,
+    "grossIncome": 3700,
+    "platformFees": 370,
+    "netIncome": 3330,
+    "averagePerBooking": 1665,
     "byMonth": [ { "month": "2026-10", "netIncome": 3330, "bookings": 2 } ]
   }
 }
 ```
+
 </details>
 
 <details>
 <summary><strong>Status codes used</strong></summary>
+
+<br>
 
 | Code | Meaning in this API |
 |---|---|
@@ -392,7 +436,10 @@ Base URL: `https://localhost:5000/api`. Every response uses the same envelope:
 | 413 | Body over 10 kb |
 | 429 | Rate limit reached (includes `retryAfterSeconds`) |
 | 500 | Unexpected error (generic message only) |
+
 </details>
+
+---
 
 ## 10. Data Model
 
@@ -402,6 +449,8 @@ Base URL: `https://localhost:5000/api`. Every response uses the same envelope:
 | `gigs` | `freelancer` → User, `title`, `description`, `category` (enum), `price` (R1–R1,000,000, max 2 dp), `deliveryDays`, `isActive` | Paused gigs (`isActive:false`) are hidden from browsing |
 | `bookings` | `gig`, `client`, `freelancer`, `gigTitle` and `amount` (snapshots), `notes`, `status` (`confirmed`/`completed`) | Snapshot keeps history correct if the gig changes |
 | `transactions` | `reference` (unique), `booking` (unique, one per booking), `client`, `freelancer`, `amount`, `platformFee`, `freelancerEarnings`, `currency`, `paymentMethod: simulated` | No update/delete endpoints |
+
+---
 
 ## 11. Security Implementation
 
@@ -447,24 +496,22 @@ Each control below lists the threat it addresses (mapped to the OWASP Top 10 202
 
 ### 11.5 Rate limiting — A07, A04
 
-Implemented with `express-rate-limit` [5]. Every limit answers with **HTTP 429** [6], the standard
-JSON envelope, a clear message and `retryAfterSeconds`, plus standard `RateLimit` / `RateLimit-Policy`
-headers so clients can see how much quota is left.
+Implemented with `express-rate-limit` [5]. Every limit answers with **HTTP 429** [6], the standard JSON envelope, a clear message and `retryAfterSeconds`, plus standard `RateLimit` / `RateLimit-Policy` headers so clients can see how much quota is left.
 
 | Limiter | Applied to | Default limit | Keyed by | Purpose |
 |---|---|---|---|---|
 | `authLimiter` | `POST /auth/login`, `POST /auth/register` | 10 per 15 min | IP + email | Stops password guessing against one account |
-| `authIpLimiter` | same | 100 per 15 min | IP | Stops spraying many different emails from one address |
-| `bookingLimiter` | `POST /bookings` | 10 per 10 min | user id | Stops fake-booking floods and junk transactions |
-| `globalLimiter` | all `/api` routes | 300 per 15 min | IP | Blunts scraping and basic denial of service |
+| `authIpLimiter` | Same | 100 per 15 min | IP | Stops spraying many different emails from one address |
+| `bookingLimiter` | `POST /bookings` | 10 per 10 min | User id | Stops fake-booking floods and junk transactions |
+| `globalLimiter` | All `/api` routes | 300 per 15 min | IP | Blunts scraping and basic denial of service |
 
 Example 429 response:
+
 ```json
 { "success": false, "message": "Too many sign-in attempts. Please wait before trying again.", "retryAfterSeconds": 900 }
 ```
 
-All limits can be tuned with `RATE_LIMIT_*` variables. The API sets `trust proxy` to 1 and the
-frontend proxy forwards the browser's IP (`xfwd`), so limits apply to the real client.
+All limits can be tuned with `RATE_LIMIT_*` variables. The API sets `trust proxy` to 1 and the frontend proxy forwards the browser's IP (`xfwd`), so limits apply to the real client.
 
 ### 11.6 Security headers and Content Security Policy — A05 Security Misconfiguration
 
@@ -476,10 +523,16 @@ script-src 'none'; style-src 'none'; img-src 'none'; connect-src 'self'; object-
 upgrade-insecure-requests
 ```
 
-It also sends `Strict-Transport-Security` (1 year), `X-Frame-Options: DENY`,
-`X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, the Cross-Origin
-Opener/Embedder/Resource policies, a `Permissions-Policy` that denies camera, microphone,
-geolocation and payment, and `Cache-Control: no-store` so personal and financial data is never cached.
+It also sends:
+
+- `Strict-Transport-Security` (1 year)
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: no-referrer`
+- The Cross-Origin Opener / Embedder / Resource policies
+- A `Permissions-Policy` that denies camera, microphone, geolocation and payment
+- `Cache-Control: no-store`, so personal and financial data is never cached
+
 `X-Powered-By` is removed.
 
 **React app (`client/vite.config.js`):**
@@ -497,9 +550,7 @@ form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
 
 ### 11.7 Transport security — A02 Cryptographic Failures
 
-Both servers run on HTTPS only (TLS 1.2 minimum on the API). The certificate includes
-`subjectAltName=localhost,127.0.0.1` so browsers accept it after the one-off self-signed warning.
-In production it would be replaced by a CA-issued certificate.
+Both servers run on HTTPS only (TLS 1.2 minimum on the API). The certificate includes `subjectAltName=localhost,127.0.0.1` so browsers accept it after the one-off self-signed warning. In production it would be replaced by a CA-issued certificate.
 
 ### 11.8 Error handling and safe responses — A05, A09
 
@@ -516,13 +567,15 @@ In production it would be replaced by a CA-issued certificate.
 - Gig ids in the URL are checked before any API call.
 - Passwords use `type="password"` with the correct `autocomplete` values, and the password field is cleared after a failed login.
 
+---
+
 ## 12. Testing
 
 | Suite | Tool | What it covers | Result | Evidence |
-|---|---|---|---|---|
-| API end-to-end | Postman + **Newman** | 87 requests (103 executed with the rate-limit loops) in 7 folders: setup, auth edge cases, gig CRUD/ownership, bookings + transactions, income, admin, rate limiting | **235 / 235 assertions pass** | `docs/evidence/newman-report.html`, `newman-results.xml`, `newman-cli-output.txt` |
-| Backend unit + HTTP | **Jest** + Supertest | JWT pinning (issuer/audience/algorithm/`none`/wrong secret), RBAC, allow-list, sanitiser, ownership helper, headers/CSP, 401 on protected routes, NoSQL injection, malformed JSON, oversized body | **34 / 34 pass** | `docs/evidence/backend-unit-tests.txt` |
-| Frontend | **Vitest** + React Testing Library + user-event | Rendering and interaction: login/register validation and API errors, role choices, gig card XSS safety, gig form validation, booking flow and receipt, 429 handling, route guards, role-based nav, sign-out | **27 / 27 pass** | `docs/evidence/frontend-tests.txt`, `frontend-test-results.xml` |
+|---|---|---|:---:|---|
+| API end-to-end | Postman + **Newman** | 87 requests (103 executed with the rate-limit loops) in 7 folders: setup, auth edge cases, gig CRUD/ownership, bookings + transactions, income, admin, rate limiting | **235 / 235** assertions pass | `docs/evidence/newman-report.html`, `newman-results.xml`, `newman-cli-output.txt` |
+| Backend unit + HTTP | **Jest** + Supertest | JWT pinning (issuer/audience/algorithm/`none`/wrong secret), RBAC, allow-list, sanitiser, ownership helper, headers/CSP, 401 on protected routes, NoSQL injection, malformed JSON, oversized body | **34 / 34** pass | `docs/evidence/backend-unit-tests.txt` |
+| Frontend | **Vitest** + React Testing Library + user-event | Rendering and interaction: login/register validation and API errors, role choices, gig card XSS safety, gig form validation, booking flow and receipt, 429 handling, route guards, role-based nav, sign-out | **27 / 27** pass | `docs/evidence/frontend-tests.txt`, `frontend-test-results.xml` |
 
 ### 12.1 Running the Newman suite
 
@@ -533,52 +586,53 @@ cd api
 npm run test:api
 ```
 
-This runs `postman/HustleHub-Part2.postman_collection.json` with the
-`HustleHub-local.postman_environment.json` environment and writes an **HTML report**
-(`newman-htmlextra`) and a **JUnit XML** file to `docs/evidence/`.
+This runs `postman/HustleHub-Part2.postman_collection.json` with the `HustleHub-local.postman_environment.json` environment, and writes an **HTML report** (`newman-htmlextra`) and a **JUnit XML** file to `docs/evidence/`.
 
 **How the collection is organised**
 
 | Folder | Highlights |
 |---|---|
-| 0. Setup | Creates fresh users for each run (unique emails), logs in each role, checks JWT structure (`HS256`, `sub/role/iss/aud/exp`, no email) |
-| 1. Authentication: invalid scenarios | Duplicate, missing fields, weak password, self-assigned admin, **unexpected fields**, script in username, NoSQL injection, wrong password vs unknown email (same message), malformed JSON, tampered token, **`alg:none` token** |
-| 2. Gigs | Create, HTML stripped, client 403, no token 401, invalid values, 3-decimal price, cannot set owner, browse/search/filter, unknown query param, limit cap, invalid/non-existent id, my gigs, update own, **other freelancer cannot edit/delete (404)**, pause hides gig, delete own |
-| 3. Bookings | Booking creates transaction, amount from gig (not request), notes sanitised, freelancer/admin cannot book, **price tampering rejected**, deleted gig 404, per-role booking lists, unrelated freelancer 404, complete booking rules |
-| 4. Transactions and income | Per-user ledgers, **income R900 → fee R90 → net R810 checked exactly**, client blocked from income, admin ledger, transactions are read-only |
-| 5. Admin | Stats, users (no hashes), non-admins blocked, gig moderation, **suspension kills an existing token**, suspended login refused, reactivation |
-| 6. Rate limiting | Repeats a wrong-password login until **429** and checks the message, `retryAfterSeconds` and `RateLimit` headers; repeats bookings until the **booking 429** |
+| **0. Setup** | Creates fresh users for each run (unique emails), logs in each role, checks JWT structure (`HS256`, `sub/role/iss/aud/exp`, no email) |
+| **1. Authentication: invalid scenarios** | Duplicate, missing fields, weak password, self-assigned admin, **unexpected fields**, script in username, NoSQL injection, wrong password vs unknown email (same message), malformed JSON, tampered token, **`alg:none` token** |
+| **2. Gigs** | Create, HTML stripped, client 403, no token 401, invalid values, 3-decimal price, cannot set owner, browse/search/filter, unknown query param, limit cap, invalid/non-existent id, my gigs, update own, **other freelancer cannot edit/delete (404)**, pause hides gig, delete own |
+| **3. Bookings** | Booking creates transaction, amount from gig (not request), notes sanitised, freelancer/admin cannot book, **price tampering rejected**, deleted gig 404, per-role booking lists, unrelated freelancer 404, complete booking rules |
+| **4. Transactions and income** | Per-user ledgers, **income R900 → fee R90 → net R810 checked exactly**, client blocked from income, admin ledger, transactions are read-only |
+| **5. Admin** | Stats, users (no hashes), non-admins blocked, gig moderation, **suspension kills an existing token**, suspended login refused, reactivation |
+| **6. Rate limiting** | Repeats a wrong-password login until **429** and checks the message, `retryAfterSeconds` and `RateLimit` headers; repeats bookings until the **booking 429** |
 
-> The collection uses `pm.execution.setNextRequest()` loops for the rate-limit tests. Rate-limit
-> counters are held in memory, so **restart the API** if you run the full collection several times
-> within 15 minutes. The collection is generated by `postman/build_collection.py`; edit that script
-> and re-run it rather than editing the JSON by hand.
+> **Note:** the collection uses `pm.execution.setNextRequest()` loops for the rate-limit tests. Rate-limit counters are held in memory, so **restart the API** if you run the full collection several times within 15 minutes. The collection is generated by `postman/build_collection.py`; edit that script and re-run it rather than editing the JSON by hand.
 
-**Manual use in Postman:** import the collection and environment, turn off
-*Settings → General → SSL certificate verification* (self-signed certificate), then run the
-collection in order.
+**Manual use in Postman:** import the collection and environment, turn off *Settings → General → SSL certificate verification* (self-signed certificate), then run the collection in order.
 
 ### 12.2 Running the unit tests
 
 ```bash
-cd api && npm test            # Jest, needs no database
-cd client && npm test         # Vitest
-cd client && npm run test:report   # verbose output + JUnit XML into docs/evidence
+cd api && npm test                  # Jest, needs no database
+cd client && npm test               # Vitest
+cd client && npm run test:report    # Verbose output + JUnit XML into docs/evidence
 ```
 
-Or from the repository root: `npm test` runs both.
+Or from the repository root, `npm test` runs both.
+
+---
 
 ## 13. Screenshots
 
-| | |
-|---|---|
-| **Browse gigs (client)**<br>![Browse](docs/screenshots/03-browse.png) | **Booking receipt with transaction reference**<br>![Receipt](docs/screenshots/04-receipt.png) |
-| **Freelancer dashboard with income**<br>![Dashboard](docs/screenshots/07-freelancer-dashboard.png) | **Validation: HTML rejected in gig form**<br>![Gig form errors](docs/screenshots/08-gig-form-errors.png) |
-| **Client bookings**<br>![Client bookings](docs/screenshots/05-client-bookings.png) | **Freelancer earnings ledger**<br>![Earnings](docs/screenshots/10-freelancer-earnings.png) |
-| **Admin panel**<br>![Admin](docs/screenshots/11-admin.png) | **Newman report**<br>![Newman](docs/screenshots/14-newman-report.png) |
-| **Register: inline validation**<br>![Register errors](docs/screenshots/02-register-errors.png) | **Failed login: generic message**<br>![Login failed](docs/screenshots/12-login-failed.png) |
+| Browse gigs (client) | Booking receipt with transaction reference |
+|:---:|:---:|
+| ![Browse](docs/screenshots/03-browse.png) | ![Receipt](docs/screenshots/04-receipt.png) |
+| **Freelancer dashboard with income** | **Validation: HTML rejected in gig form** |
+| ![Dashboard](docs/screenshots/07-freelancer-dashboard.png) | ![Gig form errors](docs/screenshots/08-gig-form-errors.png) |
+| **Client bookings** | **Freelancer earnings ledger** |
+| ![Client bookings](docs/screenshots/05-client-bookings.png) | ![Earnings](docs/screenshots/10-freelancer-earnings.png) |
+| **Admin panel** | **Newman report** |
+| ![Admin](docs/screenshots/11-admin.png) | ![Newman](docs/screenshots/14-newman-report.png) |
+| **Register: inline validation** | **Failed login: generic message** |
+| ![Register errors](docs/screenshots/02-register-errors.png) | ![Login failed](docs/screenshots/12-login-failed.png) |
 
-More in `docs/screenshots/`, including the mobile layout.
+More screenshots, including the mobile layout, are in `docs/screenshots/`.
+
+---
 
 ## 14. Design Decisions and Trade-offs
 
@@ -595,15 +649,24 @@ More in `docs/screenshots/`, including the mobile layout.
 | Rate limits keyed by IP + email and by IP | One attacker cannot lock out everyone on a shared network, but cannot spray emails either | Two limiters to configure |
 | Freelancer income = amount − 10% fee | Demonstrates fee/earnings separation that Part 3's tax estimate will build on | The fee rate is a constant in code (`PLATFORM_FEE_RATE`) |
 
-## 15. Demonstration Video , YouTube Link:
+---
 
-https://youtu.be/uqReKYvFHD4
+## 15. Demonstration Video
 
-The video demonstrates: registration of a freelancer and a client, login with JWT, gig creation,
-browsing and searching, booking with the receipt and transaction reference, the freelancer
-viewing the booking and their updated income, the payments ledger, the admin panel, RBAC refusals
-(e.g. a client calling an admin endpoint in Postman), rate limiting (429), and the Newman,
-Jest and Vitest runs.
+▶️ **Watch on YouTube:** [https://youtu.be/uqReKYvFHD4](https://youtu.be/uqReKYvFHD4)
+
+The video demonstrates:
+
+- Registration of a freelancer and a client, and login with JWT
+- Gig creation, browsing and searching
+- Booking, with the receipt and transaction reference
+- The freelancer viewing the booking and their updated income
+- The payments ledger and the admin panel
+- RBAC refusals (e.g. a client calling an admin endpoint in Postman)
+- Rate limiting (429)
+- The Newman, Jest and Vitest test runs
+
+---
 
 ## 16. References
 
@@ -623,6 +686,8 @@ Jest and Vitest runs.
 
 [8] MDN Web Docs, "Content Security Policy (CSP)," Mozilla. [Online]. Available: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
 
+---
+
 ## 17. Team
 
 | Student number | Name |
@@ -631,4 +696,4 @@ Jest and Vitest runs.
 | ST10460086 | Reece Moodley |
 | ST10441678 | Taytem Pillay |
 
-*INSY7314 · POE Part 2*
+<p align="center"><em>INSY7314 · POE Part 2</em></p>
