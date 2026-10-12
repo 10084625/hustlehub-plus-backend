@@ -76,3 +76,30 @@ const q = (params) => {
   const s = usp.toString();
   return s ? `?${s}` : '';
 };
+
+export const api = {
+  register: (data) => request('/auth/register', { method: 'POST', body: data }),
+  login: (data) => request('/auth/login', { method: 'POST', body: data }),
+  profile: () => request('/auth/profile'),
+
+  listGigs: (params = {}) => request(`/gigs${q(params)}`),
+  myGigs: () => request('/gigs/mine'),
+  getGig: (id) => request(`/gigs/${encodeURIComponent(id)}`),
+  createGig: (data) => request('/gigs', { method: 'POST', body: data }),
+  updateGig: (id, data) => request(`/gigs/${encodeURIComponent(id)}`, { method: 'PATCH', body: data }),
+  deleteGig: (id) => request(`/gigs/${encodeURIComponent(id)}`, { method: 'DELETE' }),
+
+  createBooking: (data) => request('/bookings', { method: 'POST', body: data }),
+  myBookings: () => request('/bookings/mine'),
+  allBookings: () => request('/bookings'),
+  completeBooking: (id) => request(`/bookings/${encodeURIComponent(id)}/complete`, { method: 'PATCH' }),
+
+  myTransactions: () => request('/transactions/mine'),
+  allTransactions: () => request('/transactions'),
+  incomeSummary: () => request('/income/summary'),
+
+  adminUsers: () => request('/admin/users'),
+  adminStats: () => request('/admin/stats'),
+  setUserStatus: (id, isActive) =>
+    request(`/admin/users/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { isActive } }),
+};
