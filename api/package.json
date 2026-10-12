@@ -1,0 +1,57 @@
+{
+  "name": "hustlehub-plus-api",
+  "version": "2.0.0",
+  "description": "Secure REST API for HustleHub+ (Part 2: Secure Stack) - auth, RBAC, gigs, bookings, transactions and income tracking on MongoDB.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "generate-certs": "bash generate-certs.sh",
+    "seed:admin": "node scripts/seedAdmin.js",
+    "test": "jest --runInBand",
+    "test:api": "newman run ../postman/HustleHub-Part2.postman_collection.json -e ../postman/HustleHub-local.postman_environment.json --insecure --reporters cli,htmlextra,junit --reporter-htmlextra-export ../docs/evidence/newman-report.html --reporter-junit-export ../docs/evidence/newman-results.xml"
+  },
+  "keywords": [
+    "hustlehub",
+    "security",
+    "express",
+    "jwt",
+    "rbac",
+    "mongodb"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1",
+    "helmet": "^8.0.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.5",
+    "morgan": "^1.10.0",
+    "xss": "^1.0.15"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1",
+    "nodemon": "^3.1.9",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "setupFiles": [
+      "<rootDir>/tests/setupEnv.js"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
