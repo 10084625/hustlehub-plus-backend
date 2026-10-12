@@ -8,6 +8,7 @@
 ![Vitest](https://img.shields.io/badge/Frontend%20tests-27%20passing-success)
 ![Jest](https://img.shields.io/badge/Backend%20unit%20tests-34%20passing-success)
 
+
 > **Module:** INSY7314, Information Systems 3D / APDS7311, Application Development Security
 > **POE Part 2:** Secure Stack (full-stack MERN application)
 
