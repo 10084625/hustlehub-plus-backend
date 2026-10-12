@@ -1,36 +1,10 @@
 {
-  "name": "hustlehub-plus-backend",
-  "version": "1.0.0",
-  "description": "Secure backend API for HustleHub+, a freelance marketplace platform. Part 1: Secure Foundations (authentication, hashing, JWT, HTTPS).",
-  "main": "src/server.js",
+  "name": "hustlehub-plus",
+  "private": true,
+  "description": "HustleHub+ secure freelance marketplace (MERN). Convenience scripts that run the api and client workspaces.",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
-    "generate-certs": "bash generate-certs.sh",
-    "test": "echo \"No unit tests configured in Part 1 - see /postman for API tests\" && exit 0"
-  },
-  "keywords": [
-    "hustlehub",
-    "security",
-    "express",
-    "jwt",
-    "authentication"
-  ],
-  "license": "MIT",
-  "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-validator": "^7.1.0",
-    "helmet": "^7.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "morgan": "^1.10.0"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.4"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "install:all": "npm --prefix api install && npm --prefix client install",
+    "test": "npm --prefix api test && npm --prefix client test",
+    "test:api": "npm --prefix api run test:api"
   }
 }
