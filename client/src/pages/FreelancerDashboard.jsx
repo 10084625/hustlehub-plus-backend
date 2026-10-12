@@ -111,3 +111,65 @@ export default function FreelancerDashboard() {
       setError(err.message);
     }
   };
+
+  return (
+    <>
+      <div className="page-head">
+        <h1>Your dashboard</h1>
+      </div>
+      <Alert>{error}</Alert>
+      <Alert kind="success">{message}</Alert>
+
+      <div className="dash">
+        {income ? <IncomePanel income={income} /> : <Loading label="Loading income" />}
+
+        <section className="panel" aria-labelledby="gigs-heading">
+          <div className="panel-head">
+            <h2 id="gigs-heading">Your gigs</h2>
+            {!showCreate && !editing && (
+              <button type="button" className="btn btn-primary" onClick={() => setShowCreate(true)}>
+                New gig
+              </button>
+            )}
+          </div>
+
+          {showCreate && <GigForm onSubmit={create} onCancel={() => setShowCreate(false)} />}
+          {editing && <GigForm initial={editing} submitLabel="Save changes" onSubmit={update} onCancel={() => setEditing(null)} />}
+
+          {!gigs ? (
+            <Loading label="Loading gigs" />
+          ) : gigs.length === 0 && !showCreate ? (
+            <Empty title="You have no gigs yet.">
+              <p>Publish one so clients can book you.</p>
+            </Empty>
+          ) : (
+            <ul className="my-gigs">
+              {gigs.map((g) => (
+                <li key={g.id} className={g.isActive ? '' : 'is-paused'}>
+                  <div className="my-gig-main">
+                    <Link to={`/gigs/${g.id}`}>{g.title}</Link>
+                    <span className="my-gig-meta">
+                      {categoryLabel(g.category)}, {g.deliveryDays} day delivery{g.isActive ? '' : ', paused'}
+                    </span>
+                  </div>
+                  <PriceTag amount={g.price} size="sm" />
+                  <div className="my-gig-actions">
+                    <button type="button" className="btn btn-small" onClick={() => { setShowCreate(false); setEditing(g); }}>
+                      Edit
+                    </button>
+                    <button type="button" className="btn btn-small" onClick={() => toggle(g)}>
+                      {g.isActive ? 'Pause' : 'Resume'}
+                    </button>
+                    <button type="button" className="btn btn-small btn-danger" onClick={() => remove(g)}>
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </>
+  );
+}
