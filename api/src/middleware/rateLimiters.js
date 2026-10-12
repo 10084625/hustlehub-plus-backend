@@ -1,3 +1,6 @@
+// References: [5] express-rate-limit, [6] RFC 6585 (HTTP 429),
+// [9] OWASP Authentication Cheat Sheet (limiting login attempts).
+// README section 16.
 const rateLimit = require('express-rate-limit');
 const config = require('../config/env');
 
