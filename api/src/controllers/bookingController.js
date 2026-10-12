@@ -95,3 +95,20 @@ const listAllBookings = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * GET /api/bookings/:id - only the booking's client, its freelancer, or an admin.
+ */
+const getBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.validated.params.id)
+      .populate('client', PARTY_FIELDS)
+      .populate('freelancer', PARTY_FIELDS);
+    if (!booking || !(isOwnerOrAdmin(req.user, booking.client) || isOwnerOrAdmin(req.user, booking.freelancer))) {
+      return next(notFound('Booking'));
+    }
+    const transaction = await Transaction.findOne({ booking: booking._id });
+    return res.status(200).json({ success: true, message: 'Booking retrieved successfully.', data: { booking, transaction } });
+  } catch (err) {
+    return next(err);
+  }
+};
