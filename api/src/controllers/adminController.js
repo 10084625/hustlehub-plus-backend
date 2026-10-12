@@ -41,3 +41,33 @@ const setUserStatus = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * GET /api/admin/stats - admin only. Platform-wide counts.
+ */
+const getStats = async (req, res, next) => {
+  try {
+    const [users, gigs, bookings, transactions] = await Promise.all([
+      User.countDocuments({}),
+      Gig.countDocuments({}),
+      Booking.countDocuments({}),
+      Transaction.find({}).select('amount platformFee').lean(),
+    ]);
+    const round2 = (n) => Math.round(n * 100) / 100;
+    return res.status(200).json({
+      success: true,
+      message: 'Platform statistics retrieved successfully.',
+      data: {
+        users,
+        gigs,
+        bookings,
+        transactions: transactions.length,
+        totalVolume: round2(transactions.reduce((s, t) => s + t.amount, 0)),
+        platformRevenue: round2(transactions.reduce((s, t) => s + t.platformFee, 0)),
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { listUsers, setUserStatus, getStats };
