@@ -80,3 +80,18 @@ const listMyBookings = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * GET /api/bookings - admin only. Every booking on the platform.
+ */
+const listAllBookings = async (req, res, next) => {
+  try {
+    const bookings = await Booking.find({})
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .populate('client', PARTY_FIELDS)
+      .populate('freelancer', PARTY_FIELDS);
+    return res.status(200).json({ success: true, message: 'All bookings retrieved successfully.', data: { bookings } });
+  } catch (err) {
+    return next(err);
+  }
+};
