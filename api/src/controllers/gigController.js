@@ -100,3 +100,27 @@ const updateGig = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * DELETE /api/gigs/:id - owning freelancer, or admin (content moderation).
+ * Bookings keep their own snapshot of the gig, so financial history is not
+ * lost when a gig is deleted.
+ */
+const deleteGig = async (req, res, next) => {
+  try {
+    const filter = { _id: req.validated.params.id };
+    if (req.user.role !== 'admin') filter.freelancer = req.user.id;
+
+    const gig = await Gig.findOneAndDelete(filter);
+    if (!gig) return next(notFound('Gig'));
+    const bookingCount = await Booking.countDocuments({ gig: gig._id });
+    return res.status(200).json({
+      success: true,
+      message: 'Gig deleted successfully.',
+      data: { id: gig._id.toString(), bookingsPreserved: bookingCount },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { listGigs, listMyGigs, getGig, createGig, updateGig, deleteGig };
