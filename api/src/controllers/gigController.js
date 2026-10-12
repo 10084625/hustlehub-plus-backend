@@ -69,3 +69,15 @@ const getGig = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * POST /api/gigs - freelancer only. The owner is ALWAYS the logged-in user;
+ * a "freelancer" field in the body would be rejected by the allow-list.
+ */
+const createGig = async (req, res, next) => {
+  try {
+    const gig = await Gig.create({ ...req.validated.body, freelancer: req.user.id });
+    return res.status(201).json({ success: true, message: 'Gig created successfully.', data: { gig } });
+  } catch (err) {
+    return next(err);
+  }
+};
