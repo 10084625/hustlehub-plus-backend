@@ -56,3 +56,16 @@ const listMyGigs = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * GET /api/gigs/:id - any logged-in user, but a paused gig is only visible
+ * to its owner or an admin.
+ */
+const getGig = async (req, res, next) => {
+  try {
+    const gig = await Gig.findById(req.validated.params.id).populate('freelancer', PUBLIC_FREELANCER_FIELDS);
+    if (!gig || (!gig.isActive && !isOwnerOrAdmin(req.user, gig.freelancer))) return next(notFound('Gig'));
+    return res.status(200).json({ success: true, message: 'Gig retrieved successfully.', data: { gig } });
+  } catch (err) {
+    return next(err);
+  }
+};
