@@ -84,4 +84,77 @@ export default function ParticleBackground() {
           color: p.color,
         };
       });
-    
+    // Faint connecting lines between nearby points
+      const linkDist = 150;
+      for (let i = 0; i < projected.length; i += 1) {
+        const a = projected[i];
+        for (let j = i + 1; j < projected.length; j += 1) {
+          const b = projected[j];
+          const dx = a.sx - b.sx;
+          const dy = a.sy - b.sy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < linkDist) {
+            const alpha = (1 - dist / linkDist) * 0.35 * Math.min(a.scale, b.scale);
+            ctx.strokeStyle = `rgba(${a.color}, ${alpha.toFixed(3)})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(a.sx, a.sy);
+            ctx.lineTo(b.sx, b.sy);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // The points themselves: nearer ones are larger and brighter
+      projected.forEach((p) => {
+        const r = 1.1 + p.scale * 1.6;
+        const alpha = Math.min(1, 0.35 + (p.scale - 0.7) * 1.1);
+        ctx.fillStyle = `rgba(${p.color}, ${alpha.toFixed(3)})`;
+        ctx.beginPath();
+        ctx.arc(p.sx, p.sy, r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    };
+
+    const tick = () => {
+      angle += 0.0009;
+      pointer.x += (pointer.tx - pointer.x) * 0.03;
+      pointer.y += (pointer.ty - pointer.y) * 0.03;
+      draw();
+      frameId = window.requestAnimationFrame(tick);
+    };
+
+    const onPointerMove = (e) => {
+      pointer.tx = (e.clientX / width) * 2 - 1;
+      pointer.ty = (e.clientY / height) * 2 - 1;
+    };
+
+    const onVisibility = () => {
+      if (document.hidden) {
+        window.cancelAnimationFrame(frameId);
+      } else if (!reduceMotion) {
+        frameId = window.requestAnimationFrame(tick);
+      }
+    };
+
+    resize();
+    window.addEventListener('resize', resize);
+
+    if (reduceMotion) {
+      draw();
+    } else {
+      window.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('visibilitychange', onVisibility);
+      frameId = window.requestAnimationFrame(tick);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="bg-canvas" aria-hidden="true" />;
+}
