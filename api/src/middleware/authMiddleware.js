@@ -1,3 +1,6 @@
+// References: [3] RFC 7519 JWT, [12] jsonwebtoken (token verification),
+// [19] OWASP Authorization Cheat Sheet (deny by default, role checks).
+// README section 16.
 const mongoose = require('mongoose');
 const AppError = require('../utils/AppError');
 const { verifyToken } = require('../utils/generateToken');
