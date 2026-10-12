@@ -41,3 +41,21 @@ describe('allowOnlyFields (Part 1 feedback fix)', () => {
     expect(err.statusCode).toBe(400);
   });
 });
+
+describe('stripHtml (XSS sanitisation)', () => {
+  test('removes script tags and their content', () => {
+    expect(stripHtml('<script>alert(1)</script>Logo design')).toBe('Logo design');
+  });
+  test('removes event-handler payloads', () => {
+    expect(stripHtml('Hi <img src=x onerror=alert(1)>there')).toBe('Hi there');
+  });
+  test('leaves plain text alone', () => {
+    expect(stripHtml('Plain text 100%')).toBe('Plain text 100%');
+  });
+});
+
+describe('isOwnerOrAdmin (ownership)', () => {
+  test('owner is allowed', () => expect(isOwnerOrAdmin({ id: 'a', role: 'freelancer' }, 'a')).toBe(true));
+  test('someone else is refused', () => expect(isOwnerOrAdmin({ id: 'b', role: 'freelancer' }, 'a')).toBe(false));
+  test('admin is allowed', () => expect(isOwnerOrAdmin({ id: 'z', role: 'admin' }, 'a')).toBe(true));
+});
