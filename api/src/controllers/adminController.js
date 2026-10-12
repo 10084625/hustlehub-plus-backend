@@ -16,3 +16,28 @@ const listUsers = async (req, res, next) => {
   }
 };
 
+/**
+ * PATCH /api/admin/users/:id/status - admin only. Suspend or reactivate an
+ * account. A suspended user's existing tokens stop working immediately,
+ * because protect() checks isActive on every request.
+ */
+const setUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.validated.params;
+    if (id === req.user.id) return next(new AppError('You cannot change the status of your own account.', 400));
+
+    const user = await User.findById(id);
+    if (!user) return next(new AppError('User not found.', 404));
+    if (user.role === 'admin') return next(new AppError('Admin accounts cannot be suspended here.', 403));
+
+    user.isActive = req.validated.body.isActive;
+    await user.save();
+    return res.status(200).json({
+      success: true,
+      message: user.isActive ? 'User reactivated.' : 'User suspended.',
+      data: { user },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
