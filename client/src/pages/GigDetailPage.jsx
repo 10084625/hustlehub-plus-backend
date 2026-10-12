@@ -56,3 +56,53 @@ export default function GigDetailPage() {
       </>
     );
 
+    if (!gig) return <Loading label="Loading gig" />;
+
+  return (
+    <div className="detail">
+      <article className="detail-main">
+        <Link to="/gigs" className="back-link">
+          All gigs
+        </Link>
+        <span className="chip">{categoryLabel(gig.category)}</span>
+        <h1>{gig.title}</h1>
+        <p className="detail-by">
+          Offered by {gig.freelancer?.username}. Delivered in {gig.deliveryDays} day{gig.deliveryDays === 1 ? '' : 's'}.
+        </p>
+        <p className="detail-desc">{gig.description}</p>
+      </article>
+
+      <aside className="detail-side">
+        <PriceTag amount={gig.price} size="lg" />
+        {result ? (
+          <>
+            <Receipt booking={result.booking} transaction={result.transaction} />
+            <Link to="/bookings" className="btn btn-primary btn-wide">
+              View my bookings
+            </Link>
+          </>
+        ) : user.role === 'client' ? (
+          <form className="form" onSubmit={book} noValidate aria-label="Book this gig">
+            <Alert>{bookError}</Alert>
+            <Field
+              as="textarea"
+              rows={3}
+              label="Notes for the freelancer (optional)"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              error={notesError}
+              maxLength={500}
+            />
+            <button type="submit" className="btn btn-primary btn-wide" disabled={busy}>
+              {busy ? 'Booking…' : 'Book this gig'}
+            </button>
+            <p className="fine-print">Payment is simulated. No card is charged.</p>
+          </form>
+        ) : (
+          <p className="fine-print">Only client accounts can book gigs.</p>
+        )}
+      </aside>
+    </div>
+  );
+}
+
