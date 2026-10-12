@@ -44,4 +44,21 @@ const protect = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * authorize - role-based access control. Use after protect.
+ *   router.post('/', protect, authorize('freelancer'), handler)
+ * A logged-in user with the wrong role gets 403 Forbidden (they are known,
+ * just not allowed), which is different from 401 (not logged in).
+ */
+const authorize =
+  (...allowedRoles) =>
+  (req, res, next) => {
+    if (!req.user) return next(new AppError(NOT_AUTHORISED, 401));
+    if (!allowedRoles.includes(req.user.role)) {
+      return next(new AppError('You do not have permission to perform this action.', 403));
+    }
+    return next();
+  };
+
+module.exports = { protect, authorize };
 
