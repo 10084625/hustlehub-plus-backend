@@ -61,3 +61,16 @@ const login = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * GET /api/auth/profile - Private
+ */
+const getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    return res.status(200).json({ success: true, message: 'Profile retrieved successfully.', data: { user } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { register, login, getProfile };
