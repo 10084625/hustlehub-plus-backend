@@ -37,4 +37,61 @@ export default function BookingsPage() {
     }
   };
 
-  
+  return (
+    <>
+      <div className="page-head">
+        <h1>{isFreelancer ? 'Bookings received' : 'My bookings'}</h1>
+      </div>
+      <Alert>{error}</Alert>
+      <Alert kind="success">{message}</Alert>
+      {!bookings ? (
+        <Loading label="Loading bookings" />
+      ) : bookings.length === 0 ? (
+        <Empty title={isFreelancer ? 'No bookings yet.' : 'You have not booked anything yet.'}>
+          {isFreelancer ? <Link to="/dashboard">Add or improve a gig</Link> : <Link to="/gigs">Browse gigs</Link>}
+        </Empty>
+      ) : (
+        <div className="table-wrap">
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Gig</th>
+                <th scope="col">{isFreelancer ? 'Client' : 'Freelancer'}</th>
+                <th scope="col">Booked</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Status</th>
+                <th scope="col" className="num">
+                  Amount
+                </th>
+                {isFreelancer && <th scope="col"><span className="visually-hidden">Actions</span></th>}
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((b) => (
+                <tr key={b.id}>
+                  <td>{b.gigTitle}</td>
+                  <td>{(isFreelancer ? b.client : b.freelancer)?.username}</td>
+                  <td>{formatDate(b.createdAt)}</td>
+                  <td className="notes-cell">{b.notes || '-'}</td>
+                  <td>
+                    <span className={`status status-${b.status}`}>{b.status === 'completed' ? 'Completed' : 'Confirmed'}</span>
+                  </td>
+                  <td className="num mono-num">{formatRand(b.amount)}</td>
+                  {isFreelancer && (
+                    <td>
+                      {b.status === 'confirmed' && (
+                        <button type="button" className="btn btn-small" onClick={() => complete(b.id)}>
+                          Mark completed
+                        </button>
+                      )}
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </>
+  );
+}
