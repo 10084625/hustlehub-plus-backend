@@ -135,3 +135,56 @@ const logout = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * POST /api/auth/logout-all - Private (Part 3, own security feature 2)
+ * Increases the user's tokenVersion, which makes EVERY token issued before
+ * now invalid (other browsers, other devices, a stolen token).
+ */
+const logoutAll = async (req, res, next) => {
+  try {
+    await User.updateOne({ _id: req.user.id }, { $inc: { tokenVersion: 1 } });
+    logEvent('info', 'auth.logout_all', req);
+    return res.status(200).json({ success: true, message: 'You have been signed out on every device.', data: {} });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+// Events a user is shown about their own account.
+const ACTIVITY_EVENTS = [
+  'auth.register.success',
+  'auth.login.success',
+  'auth.login.failed',
+  'auth.lockout.triggered',
+  'auth.logout',
+  'auth.logout_all',
+  'admin.user.status_changed',
+];
+
+/**
+ * GET /api/auth/activity - Private (Part 3)
+ * The signed-in user's recent account activity, so they can spot a sign-in
+ * they do not recognise. Only the user's own entries are returned.
+ */
+const getActivity = async (req, res, next) => {
+  try {
+    const entries = await AuditLog.find({ user: req.user.id, event: trusted({ $in: ACTIVITY_EVENTS }) })
+      .sort({ createdAt: -1 })
+      .limit(20)
+      .select('event ip createdAt details.reason')
+      .lean();
+    const activity = entries.map((e) => ({
+      id: e._id.toString(),
+      event: e.event,
+      ip: e.ip,
+      at: e.createdAt,
+      reason: e.details && e.details.reason,
+    }));
+    return res.status(200).json({ success: true, message: 'Account activity retrieved successfully.', data: { activity } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { register, login, getProfile, logout, logoutAll, getActivity, ACTIVITY_EVENTS };
