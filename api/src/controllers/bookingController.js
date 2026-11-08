@@ -77,3 +77,73 @@ const createBooking = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/bookings/mine - client sees bookings they made; freelancer sees
+ * bookings made on their gigs. The filter is built from the token's user id,
+ * so there is no way to ask for someone else's bookings.
+ */
+const listMyBookings = async (req, res, next) => {
+  try {
+    const filter = req.user.role === 'freelancer' ? { freelancer: req.user.id } : { client: req.user.id };
+    const bookings = await Booking.find(filter)
+      .sort({ createdAt: -1 })
+      .populate('client', PARTY_FIELDS)
+      .populate('freelancer', PARTY_FIELDS);
+    return res.status(200).json({ success: true, message: 'Bookings retrieved successfully.', data: { bookings } });
+  } catch (err) {
+    return next(err);
+  }
+};
+/**
+ * GET /api/bookings - admin only. Every booking on the platform.
+ */
+const listAllBookings = async (req, res, next) => {
+  try {
+    const bookings = await Booking.find({})
+      .sort({ createdAt: -1 })
+      .limit(200)
+      .populate('client', PARTY_FIELDS)
+      .populate('freelancer', PARTY_FIELDS);
+    return res.status(200).json({ success: true, message: 'All bookings retrieved successfully.', data: { bookings } });
+  } catch (err) {
+    return next(err);
+  }
+};
+/**
+ * GET /api/bookings/:id - only the booking's client, its freelancer, or an admin.
+ */
+const getBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findById(req.validated.params.id)
+      .populate('client', PARTY_FIELDS)
+      .populate('freelancer', PARTY_FIELDS);
+    if (!booking || !(isOwnerOrAdmin(req.user, booking.client) || isOwnerOrAdmin(req.user, booking.freelancer))) {
+      return next(notFound('Booking'));
+    }
+    const transaction = await Transaction.findOne({ booking: booking._id });
+    return res.status(200).json({ success: true, message: 'Booking retrieved successfully.', data: { booking, transaction } });
+  } catch (err) {
+    return next(err);
+  }
+};
+/**
+ * PATCH /api/bookings/:id/complete - the freelancer who received the
+ * booking marks the work as delivered.
+ */
+const completeBooking = async (req, res, next) => {
+  try {
+    const booking = await Booking.findOneAndUpdate(
+      { _id: req.validated.params.id, freelancer: req.user.id, status: 'confirmed' },
+      { $set: { status: 'completed' } },
+      { new: true }
+    );
+    if (!booking) return next(notFound('Open booking'));
+    logEvent('info', 'booking.completed', req, { booking: booking.id });
+    return res.status(200).json({ success: true, message: 'Booking marked as completed.', data: { booking } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { createBooking, listMyBookings, listAllBookings, getBooking, completeBooking };
