@@ -86,3 +86,61 @@ const getStats = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/admin/audit-logs - admin only (Part 3).
+ * Newest first, optionally filtered by level and by an event prefix such as
+ * "auth" or "auth.login". Read-only: there is no route to change entries.
+ */
+const listAuditLogs = async (req, res, next) => {
+  try {
+    const { level, event, limit = 50 } = req.validated.query;
+    const filter = {};
+    if (level) filter.level = level;
+    // The prefix is validated to letters, dots and underscores, so it is safe
+    // to use in an anchored regular expression.
+    if (event) filter.event = trusted({ $regex: `^${event.replace(/\./g, '\\.')}` });
+    const logs = await AuditLog.find(filter).sort({ createdAt: -1 }).limit(limit).populate('user', 'username role');
+    return res.status(200).json({ success: true, message: 'Audit log retrieved successfully.', data: { logs } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/**
+ * GET /api/admin/ledger/verify - admin only (Part 3, tamper-evident ledger).
+ * Re-checks the HMAC signature of every transaction. Any record whose money
+ * fields were changed outside the application is reported, and an
+ * error-level security event is raised so monitoring can alert on it.
+ */
+const verifyLedger = async (req, res, next) => {
+  try {
+    const transactions = await Transaction.find({}).select('+signature').lean();
+    const result = { checked: transactions.length, valid: 0, unsigned: 0, tampered: [] };
+    transactions.forEach((t) => {
+      const status = verifyTransaction(t);
+      if (status === 'valid') result.valid += 1;
+      else if (status === 'unsigned') result.unsigned += 1;
+      else result.tampered.push({ id: t._id.toString(), reference: t.reference, amount: t.amount });
+    });
+
+    if (result.tampered.length > 0) {
+      logEvent('error', 'ledger.tamper_detected', req, {
+        tamperedCount: result.tampered.length,
+        references: result.tampered.map((t) => t.reference).slice(0, 20),
+      });
+    } else {
+      logEvent('info', 'ledger.verified', req, { checked: result.checked, unsigned: result.unsigned });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.tampered.length ? 'Integrity problems found in the ledger.' : 'Every signed transaction is intact.',
+      data: { ...result, intact: result.tampered.length === 0 },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { listUsers, setUserStatus, getStats, listAuditLogs, verifyLedger };
