@@ -22,3 +22,18 @@ const { Gig } = require('../src/models/Gig');
 const { Booking } = require('../src/models/Booking');
 const { Transaction, PLATFORM_FEE_RATE } = require('../src/models/Transaction');
 const { taxYearFor } = require('../src/utils/taxCalculator');
+
+if (config.nodeEnv === 'production') {
+  console.error('seed:demo is for local development only.');
+  process.exit(1);
+}
+
+const PASSWORD = process.env.DEMO_PASSWORD || 'Demo!Pass2026';
+const round2 = (n) => Math.round(n * 100) / 100;
+
+const upsertUser = async (username, email, role, hash) => {
+  const user = (await User.findOne({ email })) || new User({ username, email, role });
+  Object.assign(user, { username, password: hash, role, isActive: true });
+  await user.save();
+  return user;
+};
