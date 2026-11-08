@@ -53,3 +53,27 @@ const createBooking = async (req, res, next) => {
       platformFee,
       freelancerEarnings: round2(gig.price - platformFee),
     });
+
+     logEvent('info', 'booking.created', req, { booking: booking.id, gig: gig.id, freelancer: gig.freelancer.toString(), amount: gig.price });
+    logEvent('info', 'transaction.created', req, {
+      reference: transaction.reference,
+      booking: booking.id,
+      amount: transaction.amount,
+      platformFee: transaction.platformFee,
+      freelancerEarnings: transaction.freelancerEarnings,
+      signed: Boolean(transaction.signature),
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: 'Booking confirmed. Payment simulated successfully.',
+      data: { booking, transaction },
+    });
+  } catch (err) {
+    if (booking) {
+      await Booking.deleteOne({ _id: booking._id }).catch(() => {});
+      logEvent('error', 'booking.rolled_back', req, { booking: booking.id, reason: err.message });
+    }
+    return next(err);
+  }
+};
