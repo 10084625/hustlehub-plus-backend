@@ -53,3 +53,36 @@ const setUserStatus = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/admin/stats - admin only. Platform-wide counts.
+ */
+const getStats = async (req, res, next) => {
+  try {
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [users, gigs, bookings, transactions, failedLogins24h, lockouts24h] = await Promise.all([
+      User.countDocuments({}),
+      Gig.countDocuments({}),
+      Booking.countDocuments({}),
+      Transaction.find({}).select('amount platformFee').lean(),
+      AuditLog.countDocuments({ event: 'auth.login.failed', createdAt: trusted({ $gte: since }) }),
+      AuditLog.countDocuments({ event: 'auth.lockout.triggered', createdAt: trusted({ $gte: since }) }),
+    ]);
+    const round2 = (n) => Math.round(n * 100) / 100;
+    return res.status(200).json({
+      success: true,
+      message: 'Platform statistics retrieved successfully.',
+      data: {
+        users,
+        gigs,
+        bookings,
+        transactions: transactions.length,
+        totalVolume: round2(transactions.reduce((s, t) => s + t.amount, 0)),
+        platformRevenue: round2(transactions.reduce((s, t) => s + t.platformFee, 0)),
+        security: { failedLogins24h, lockouts24h },
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
