@@ -93,3 +93,25 @@ const config = Object.freeze({
     maxAttempts: int(process.env.LOCKOUT_MAX_ATTEMPTS, 5),
     lockMinutes: int(process.env.LOCKOUT_MINUTES, 15),
   }),
+
+   // Part 3: tamper-evident ledger (own security feature 3)
+  ledger: Object.freeze({
+    secret: ledgerSecret,
+  }),
+
+  // Part 3: logging and monitoring
+  logging: Object.freeze({
+    level: process.env.LOG_LEVEL || (nodeEnv === 'production' ? 'info' : 'debug'),
+    dir: path.resolve(process.cwd(), process.env.LOG_DIR || './logs'),
+    toFile: nodeEnv !== 'test' && process.env.LOG_TO_FILE !== 'false',
+    json: nodeEnv === 'production' || process.env.LOG_FORMAT === 'json',
+    // Cloud logging (Azure Application Insights). Only used when set.
+    azureConnectionString: process.env.APPLICATIONINSIGHTS_CONNECTION_STRING || '',
+    auditRetentionDays: int(process.env.AUDIT_RETENTION_DAYS, 90),
+  }),
+
+  // Docker: create or update the admin account from ADMIN_* when the API starts.
+  seedAdminOnStart: process.env.SEED_ADMIN_ON_START === 'true',
+});
+
+module.exports = config;
