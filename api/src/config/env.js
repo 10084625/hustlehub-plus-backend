@@ -20,3 +20,10 @@ const fail = (message) => {
   console.error(`FATAL CONFIG ERROR: ${message}`);
   process.exit(1);
 };
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret) {
+  fail('JWT_SECRET is not set. Copy .env.example to .env and set a long random secret.');
+}
+if (jwtSecret.length < MIN_SECRET_LENGTH) {
+  fail(`JWT_SECRET must be at least ${MIN_SECRET_LENGTH} characters long.`);
+}
