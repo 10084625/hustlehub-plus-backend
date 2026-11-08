@@ -28,3 +28,32 @@ const lockedError = (res, retryAfterSeconds) => {
   err.extra = { retryAfterSeconds };
   return err;
 };
+
+/**
+ * POST /api/auth/register - Public
+ * Creates a client or freelancer account. "admin" is rejected by validation.
+ */
+const register = async (req, res, next) => {
+  try {
+    const { username, email, password, role } = req.validated.body;
+
+    const existing = await User.findOne(trusted({ $or: [{ email }, { username }] })).lean();
+    if (existing) {
+      const field = existing.email === email ? 'email' : 'username';
+      logEvent('warn', 'auth.register.duplicate', req, { field });
+      return next(new AppError(`An account with this ${field} already exists.`, 409));
+    }
+
+    const passwordHash = await bcrypt.hash(password, config.bcrypt.saltRounds);
+    const user = await User.create({ username, email, password: passwordHash, role: role || 'client' });
+
+    logEvent('info', 'auth.register.success', req, { role: user.role }, { userId: user.id });
+    return res.status(201).json({
+      success: true,
+      message: 'User registered successfully.',
+      data: { user: user.toJSON(), token: generateToken(user) },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
