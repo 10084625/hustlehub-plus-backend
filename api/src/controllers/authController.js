@@ -104,3 +104,34 @@ const login = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/auth/profile - Private
+ */
+const getProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    return res.status(200).json({ success: true, message: 'Profile retrieved successfully.', data: { user } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/**
+ * POST /api/auth/logout - Private (Part 3, own security feature 2)
+ * Puts this token's id on the deny-list until the moment it would have
+ * expired. The same token is refused from then on, even if it was copied.
+ */
+const logout = async (req, res, next) => {
+  try {
+    await RevokedToken.updateOne(
+      { jti: req.auth.jti },
+      { $setOnInsert: { jti: req.auth.jti, user: req.user.id, expiresAt: req.auth.expiresAt } },
+      { upsert: true }
+    );
+    logEvent('info', 'auth.logout', req);
+    return res.status(200).json({ success: true, message: 'You have been signed out.', data: {} });
+  } catch (err) {
+    return next(err);
+  }
+};
