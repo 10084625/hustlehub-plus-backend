@@ -37,3 +37,23 @@ const upsertUser = async (username, email, role, hash) => {
   await user.save();
   return user;
 };
+
+const GIGS = [
+  { title: 'Full brand identity package', description: 'Logo, colour palette, typography and a brand guidelines document for your business.', category: 'design', price: 18500, deliveryDays: 14 },
+  { title: 'React web app bug fixing', description: 'I find and fix bugs in your React or Node.js app and explain what went wrong.', category: 'development', price: 6500, deliveryDays: 3 },
+  { title: 'Website copy that converts', description: 'Clear, friendly website copy for up to five pages, written for South African customers.', category: 'writing', price: 4200, deliveryDays: 5 },
+];
+
+const run = async () => {
+  await connectDB();
+  const hash = await bcrypt.hash(PASSWORD, config.bcrypt.saltRounds);
+  const freelancer = await upsertUser('demo_freelancer', 'demo.freelancer@hustlehub.local', 'freelancer', hash);
+  const client = await upsertUser('demo_client', 'demo.client@hustlehub.local', 'client', hash);
+
+  // Start clean for the demo freelancer
+  await Promise.all([
+    Transaction.deleteMany({ freelancer: freelancer._id }),
+    Booking.deleteMany({ freelancer: freelancer._id }),
+    Gig.deleteMany({ freelancer: freelancer._id }),
+  ]);
+  const gigs = await Gig.insertMany(GIGS.map((g) => ({ ...g, freelancer: freelancer._id })));
