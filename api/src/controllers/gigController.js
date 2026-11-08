@@ -71,3 +71,65 @@ const getGig = async (req, res, next) => {
     return next(err);
   }
 };
+/**
+ * POST /api/gigs - freelancer only. The owner is ALWAYS the logged-in user;
+ * a "freelancer" field in the body would be rejected by the allow-list.
+ */
+const createGig = async (req, res, next) => {
+  try {
+    const gig = await Gig.create({ ...req.validated.body, freelancer: req.user.id });
+    logEvent('info', 'gig.created', req, { gig: gig.id, price: gig.price, category: gig.category });
+    return res.status(201).json({ success: true, message: 'Gig created successfully.', data: { gig } });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+/**
+ * PATCH /api/gigs/:id - owning freelancer only.
+ * The ownership check is part of the database query itself, so there is no
+ * window where another user's gig is loaded and then modified.
+ */
+const updateGig = async (req, res, next) => {
+  try {
+    const gig = await Gig.findOneAndUpdate(
+      { _id: req.validated.params.id, freelancer: req.user.id },
+      { $set: req.validated.body },
+      { new: true, runValidators: true }
+    );
+    if (!gig) return next(notFound('Gig'));
+    logEvent('info', 'gig.updated', req, { gig: gig.id, fields: Object.keys(req.validated.body) });
+    return res.status(200).json({ success: true, message: 'Gig updated successfully.', data: { gig } });
+  } catch (err) {
+    return next(err);
+  }
+};
+/**
+ * DELETE /api/gigs/:id - owning freelancer, or admin (content moderation).
+ * Bookings keep their own snapshot of the gig, so financial history is not
+ * lost when a gig is deleted.
+ */
+const deleteGig = async (req, res, next) => {
+  try {
+    const filter = { _id: req.validated.params.id };
+    if (req.user.role !== 'admin') filter.freelancer = req.user.id;
+
+    const gig = await Gig.findOneAndDelete(filter);
+    if (!gig) return next(notFound('Gig'));
+    const bookingCount = await Booking.countDocuments({ gig: gig._id });
+    logEvent(req.user.role === 'admin' ? 'warn' : 'info', req.user.role === 'admin' ? 'gig.removed_by_admin' : 'gig.deleted', req, {
+      gig: gig.id,
+      owner: gig.freelancer.toString(),
+      bookingsPreserved: bookingCount,
+    });
+    return res.status(200).json({
+      success: true,
+      message: 'Gig deleted successfully.',
+      data: { id: gig._id.toString(), bookingsPreserved: bookingCount },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { listGigs, listMyGigs, getGig, createGig, updateGig, deleteGig };
