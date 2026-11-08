@@ -8,3 +8,18 @@
 const mongoose = require('mongoose');
 const connectDB = require('../src/config/db');
 const { ensureAdmin } = require('../src/utils/seedAdmin');
+
+const run = async () => {
+  const { ADMIN_USERNAME, ADMIN_EMAIL, ADMIN_PASSWORD } = process.env;
+  await connectDB();
+  const result = await ensureAdmin({ username: ADMIN_USERNAME, email: ADMIN_EMAIL, password: ADMIN_PASSWORD });
+  console.log(`Admin account ready: ${result.email}`);
+  await mongoose.disconnect();
+};
+
+// If anything fails (missing values, database not reachable), say why and
+// exit with a failure code.
+run().catch((err) => {
+  console.error('Seeding failed:', err.message);
+  process.exit(1);
+});
