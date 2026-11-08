@@ -57,3 +57,40 @@ const run = async () => {
     Gig.deleteMany({ freelancer: freelancer._id }),
   ]);
   const gigs = await Gig.insertMany(GIGS.map((g) => ({ ...g, freelancer: freelancer._id })));
+
+  
+  // Bookings spread over the months of the tax year that have started
+  const year = taxYearFor(new Date());
+  const now = Date.now();
+  let count = 0;
+  for (let m = 0; m < year.monthsElapsed; m += 1) {
+    const perMonth = 1 + ((m * 7) % 3); // 1 to 3 bookings, varies by month
+    for (let k = 0; k < perMonth; k += 1) {
+      const gig = gigs[(m + k) % gigs.length];
+      const day = 3 + ((k * 9 + m * 5) % 24);
+      const at = new Date(Date.UTC(year.start.getUTCFullYear(), 2 + m, day, 9 + k, 0, 0));
+      if (at.getTime() <= now) {
+        const booking = await Booking.create({
+          gig: gig._id, client: client._id, freelancer: freelancer._id,
+          gigTitle: gig.title, amount: gig.price, status: m < year.monthsElapsed - 1 ? 'completed' : 'confirmed',
+          createdAt: at, updatedAt: at,
+        });
+        const fee = round2(gig.price * PLATFORM_FEE_RATE);
+        await Transaction.create({
+          reference: `HH-DEMO${String(count).padStart(3, '0')}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`,
+          booking: booking._id, client: client._id, freelancer: freelancer._id,
+          amount: gig.price, platformFee: fee, freelancerEarnings: round2(gig.price - fee),
+          createdAt: at, updatedAt: at,
+        });
+        count += 1;
+      }
+    }
+  }
+  console.log(`Demo data ready: ${count} bookings for demo_freelancer in tax year ${year.label}. Password: ${PASSWORD}`);
+  await mongoose.disconnect();
+};
+
+run().catch((err) => {
+  console.error('Demo seeding failed:', err.message);
+  process.exit(1);
+});
