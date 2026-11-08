@@ -17,8 +17,7 @@ const run = async () => {
   await mongoose.disconnect();
 };
 
-// If anything fails (missing values, database not reachable), say why and
-// exit with a failure code.
+
 run().catch((err) => {
   console.error('Seeding failed:', err.message);
   process.exit(1);
