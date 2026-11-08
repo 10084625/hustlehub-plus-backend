@@ -51,3 +51,45 @@ const int = (value, fallback) => {
   const parsed = parseInt(value, 10);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 };
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+const config = Object.freeze({
+  nodeEnv,
+  port: int(process.env.PORT, 5000),
+  mongoUri,
+
+  jwt: Object.freeze({
+    secret: jwtSecret,
+    expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    issuer: process.env.JWT_ISSUER || 'hustlehub-plus-api',
+    audience: process.env.JWT_AUDIENCE || 'hustlehub-plus-client',
+    // One algorithm only. Verification rejects anything else, which blocks
+    // "alg: none" and algorithm-confusion attacks.
+    algorithm: 'HS256',
+  }),
+
+  bcrypt: Object.freeze({
+    saltRounds: int(process.env.BCRYPT_SALT_ROUNDS, 12),
+  }),
+
+  ssl: Object.freeze({
+    keyPath: path.resolve(process.cwd(), process.env.SSL_KEY_PATH || './certs/key.pem'),
+    certPath: path.resolve(process.cwd(), process.env.SSL_CERT_PATH || './certs/cert.pem'),
+  }),
+
+  cors: Object.freeze({
+    origin: (process.env.CORS_ORIGIN || 'https://localhost:3000').split(',').map((o) => o.trim()),
+  }),
+
+  rateLimit: Object.freeze({
+    auth: { max: int(process.env.RATE_LIMIT_AUTH_MAX, 10), windowMin: int(process.env.RATE_LIMIT_AUTH_WINDOW_MIN, 15) },
+    booking: { max: int(process.env.RATE_LIMIT_BOOKING_MAX, 10), windowMin: int(process.env.RATE_LIMIT_BOOKING_WINDOW_MIN, 10) },
+    global: { max: int(process.env.RATE_LIMIT_GLOBAL_MAX, 300), windowMin: int(process.env.RATE_LIMIT_GLOBAL_WINDOW_MIN, 15) },
+  }),
+
+  // Part 3: account lockout (own security feature 1)
+  lockout: Object.freeze({
+    maxAttempts: int(process.env.LOCKOUT_MAX_ATTEMPTS, 5),
+    lockMinutes: int(process.env.LOCKOUT_MINUTES, 15),
+  }),
