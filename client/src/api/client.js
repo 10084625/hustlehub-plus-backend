@@ -27,11 +27,13 @@ export class ApiError extends Error {
   }
 }
 
-const FRIENDLY = {
-  0: 'We could not reach the server. Check your connection and try again.',
-  429: 'You are doing that too often. Please wait a few minutes and try again.',
-  500: 'Something went wrong on our side. Please try again shortly.',
-};
+// A Map keyed by status code (static analysis fix: no obj[value] lookups).
+const FRIENDLY = new Map([
+  [0, 'We could not reach the server. Check your connection and try again.'],
+  [423, 'This account is temporarily locked. Please try again later.'],
+  [429, 'You are doing that too often. Please wait a few minutes and try again.'],
+  [500, 'Something went wrong on our side. Please try again shortly.'],
+]);
 
 export async function request(path, { method = 'GET', body } = {}) {
   const headers = { Accept: 'application/json' };
@@ -48,7 +50,7 @@ export async function request(path, { method = 'GET', body } = {}) {
       cache: 'no-store',
     });
   } catch {
-    throw new ApiError(FRIENDLY[0], 0);
+    throw new ApiError(FRIENDLY.get(0), 0);
   }
 
   let payload = null;
@@ -62,7 +64,7 @@ export async function request(path, { method = 'GET', body } = {}) {
     if (res.status === 401 && authToken) onUnauthorised();
     // Messages from our API are written to be safe for users. Server errors
     // always fall back to a generic message.
-    const message = res.status >= 500 ? FRIENDLY[500] : payload?.message || FRIENDLY[res.status] || 'Request failed.';
+    const message = res.status >= 500 ? FRIENDLY.get(500) : payload?.message || FRIENDLY.get(res.status) || 'Request failed.';
     throw new ApiError(message, res.status);
   }
   return payload?.data ?? {};
@@ -81,6 +83,9 @@ export const api = {
   register: (data) => request('/auth/register', { method: 'POST', body: data }),
   login: (data) => request('/auth/login', { method: 'POST', body: data }),
   profile: () => request('/auth/profile'),
+  logout: () => request('/auth/logout', { method: 'POST' }),
+  logoutAll: () => request('/auth/logout-all', { method: 'POST' }),
+  activity: () => request('/auth/activity'),
 
   listGigs: (params = {}) => request(`/gigs${q(params)}`),
   myGigs: () => request('/gigs/mine'),
@@ -97,9 +102,12 @@ export const api = {
   myTransactions: () => request('/transactions/mine'),
   allTransactions: () => request('/transactions'),
   incomeSummary: () => request('/income/summary'),
+  taxEstimate: (ageGroup = 'under65') => request(`/income/tax-estimate${q({ ageGroup })}`),
 
   adminUsers: () => request('/admin/users'),
   adminStats: () => request('/admin/stats'),
   setUserStatus: (id, isActive) =>
-    request(`/admin/users/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { isActive } }),
+  request(`/admin/users/${encodeURIComponent(id)}/status`, { method: 'PATCH', body: { isActive } }),
+  auditLogs: (params = {}) => request(`/admin/audit-logs${q(params)}`),
+  verifyLedger: () => request('/admin/ledger/verify'),
 };

@@ -921,3 +921,343 @@ legend {
     animation: none !important;
   }
 }
+
+/* ===================== Part 3: tax and income dashboard ===================== */
+.mono {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: var(--step--1);
+}
+.tax {
+  margin-bottom: 1.5rem;
+}
+.tax-head h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: var(--step-2);
+}
+.tax-dates {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.kpis div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  display: grid;
+  gap: 0.15rem;
+  backdrop-filter: blur(6px);
+}
+.kpis dt {
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+}
+.kpis dd {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 700;
+}
+.kpis .kpi-tax {
+  border-color: rgba(244, 178, 62, 0.45);
+  background: linear-gradient(160deg, rgba(244, 178, 62, 0.14), var(--surface) 60%);
+}
+.kpi-note {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+}
+.tax-good {
+  background: var(--jade-wash);
+  border: 1px solid rgba(95, 224, 189, 0.35);
+  border-radius: var(--radius);
+  padding: 0.75rem 1rem;
+  margin: 0 0 1rem;
+}
+.tax-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+.tax-charts .panel,
+.tax-method {
+  margin-bottom: 1rem;
+}
+.tax-charts h3,
+.tax-method summary {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+}
+.tax-method summary {
+  cursor: pointer;
+  margin: 0;
+}
+.tax-method[open] summary {
+  margin-bottom: 1rem;
+}
+
+/* Bar chart */
+.chart {
+  margin: 0;
+}
+.chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.chart-axis {
+  fill: var(--ink-soft);
+  font-size: 11px;
+  font-family: var(--font-body);
+}
+.chart-axis-current {
+  fill: var(--marigold);
+  font-weight: 600;
+}
+.chart-empty {
+  fill: var(--ink-soft);
+  font-size: 14px;
+}
+.chart-legend,
+.split-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  margin-top: 0.5rem;
+}
+.swatch {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 2px;
+  margin-right: 0.4rem;
+  vertical-align: -0.1rem;
+}
+.seg-takehome {
+  fill: var(--jade);
+  stroke: var(--jade);
+  background: var(--jade);
+}
+.seg-tax {
+  fill: var(--marigold);
+  stroke: var(--marigold);
+  background: var(--marigold);
+}
+.seg-fee {
+  fill: #6f7f9e;
+  stroke: #6f7f9e;
+  background: #6f7f9e;
+}
+
+/* Donut */
+.split {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+}
+.split-svg {
+  width: min(100%, 12rem);
+  height: auto;
+}
+.split-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 16;
+}
+.split-seg {
+  fill: none;
+  stroke-width: 16;
+}
+.split-total {
+  fill: var(--ink);
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+}
+.split-caption {
+  fill: var(--ink-soft);
+  font-size: 9px;
+}
+.split figcaption {
+  width: 100%;
+}
+.split-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.split-legend li {
+  display: grid;
+  grid-template-columns: auto 1fr auto 3rem;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink);
+}
+.split-pct {
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+/* Method */
+.age-picker {
+  border: 0;
+  padding: 0;
+  margin: 0 0 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.age-picker legend {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+  padding: 0;
+}
+.age-picker label {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  cursor: pointer;
+  font-size: var(--step--1);
+}
+.age-picker label.is-selected {
+  border-color: var(--jade-deep);
+  background: var(--jade-wash);
+}
+.age-picker input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.age-picker label:focus-within {
+  outline: 3px solid var(--marigold);
+  outline-offset: 2px;
+}
+.tax-steps {
+  margin: 0 0 1.25rem;
+  padding-left: 1.4rem;
+  display: grid;
+  gap: 0.5rem;
+}
+.tax-steps li {
+  padding-left: 0.25rem;
+}
+.tax-steps li::marker {
+  color: var(--jade-deep);
+  font-weight: 700;
+}
+.tax-steps li {
+  display: list-item;
+}
+.tax-steps li > span:first-child {
+  display: inline;
+}
+.tax-steps li > span:last-child {
+  float: right;
+  margin-left: 1rem;
+}
+.tax-steps li::after {
+  content: '';
+  display: block;
+  clear: both;
+}
+.tax-caption {
+  text-align: left;
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+  padding-bottom: 0.5rem;
+}
+
+/* Account page */
+.account-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+.activity {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.activity li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.activity li.is-warning .activity-what {
+  color: var(--danger);
+}
+.activity-meta {
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+  text-align: right;
+}
+
+/* Admin security */
+.filter-row {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.75rem 0;
+}
+.level {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--info-wash);
+}
+.level-warn {
+  background: rgba(244, 178, 62, 0.18);
+  color: var(--marigold);
+}
+.level-error {
+  background: var(--danger-wash);
+  color: var(--danger);
+}
+
+@media (max-width: 900px) {
+  .kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tax-charts,
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .kpis {
+    grid-template-columns: 1fr;
+  }
+  .tax-steps li > span:last-child {
+    float: none;
+    display: block;
+    margin: 0;
+  }
+}
