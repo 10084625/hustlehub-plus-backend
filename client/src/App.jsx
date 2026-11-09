@@ -25,7 +25,6 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-
         <Route element={<ProtectedRoute />}>
           <Route path="gigs" element={<BrowseGigsPage />} />
           <Route path="gigs/:id" element={<GigDetailPage />} />
