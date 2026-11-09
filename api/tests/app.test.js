@@ -34,10 +34,30 @@ describe('API security behaviour (no database needed)', () => {
     ['get', '/api/transactions/mine'],
     ['get', '/api/income/summary'],
     ['get', '/api/admin/users'],
+    ['get', '/api/income/tax-estimate'],
+    ['post', '/api/auth/logout'],
+    ['post', '/api/auth/logout-all'],
+    ['get', '/api/auth/activity'],
+    ['get', '/api/admin/audit-logs'],
+    ['get', '/api/admin/ledger/verify'],
   ])('%s %s requires a JWT', async (method, path) => {
-    const res = await request(app)[method](path);
+    const res = method === 'post' ? await request(app).post(path) : await request(app).get(path);
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
+  });
+
+  test('Part 3: every response carries a random request id', async () => {
+    const a = await request(app).get('/api/health');
+    const b = await request(app).get('/api/health').set('X-Request-Id', 'attacker-chosen-id');
+    expect(a.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
+    expect(b.headers['x-request-id']).not.toBe('attacker-chosen-id');
+  });
+
+  test('Part 3: error responses include the request id for support, nothing internal', async () => {
+    const res = await request(app).get('/api/gigs');
+    expect(res.status).toBe(401);
+    expect(res.body.requestId).toBe(res.headers['x-request-id']);
+    expect(Object.keys(res.body).sort()).toEqual(['message', 'requestId', 'success']);
   });
 
   test('a garbage token is rejected', async () => {
