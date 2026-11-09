@@ -77,3 +77,28 @@ const getIncomeSummary = async (req, res, next) => {
     return next(err);
   }
 };
+
+/**
+ * GET /api/income/tax-estimate?ageGroup=under65|65to74|75plus - freelancer only (Part 3).
+ *
+ * Estimated income tax for the current South African tax year (1 March to
+ * end of February), worked out from the freelancer's own verified
+ * transactions. The full method is explained in utils/taxCalculator.js and
+ * README section 4.4.
+ */
+const getTaxEstimate = async (req, res, next) => {
+  try {
+    const { ageGroup = 'under65' } = req.validated.query;
+    const { transactions, integrity } = await loadVerifiedTransactions(req);
+    const estimate = estimateTax(transactions, { ageGroup });
+    return res.status(200).json({
+      success: true,
+      message: 'Tax estimate calculated successfully.',
+      data: { ...estimate, integrity },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
+
+module.exports = { getIncomeSummary, getTaxEstimate };
