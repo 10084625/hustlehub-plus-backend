@@ -30,3 +30,28 @@ const toDimensions = (entry) =>
       .filter(([key, value]) => !['level', 'message'].includes(key) && value !== undefined)
       .map(([key, value]) => [key, typeof value === 'string' ? value : JSON.stringify(value)])
   );
+
+  class AzureTransport extends Transport {
+  constructor({ client, ...opts }) {
+    super(opts);
+    this.client = client;
+  }
+
+  log(info, callback) {
+    setImmediate(() => this.emit('logged', info));
+    if (info.event !== 'http.request') {
+      const properties = toDimensions(info);
+      this.client.trackTrace({
+        message: info.event && info.event !== info.message ? `${info.event}: ${info.message}` : String(info.message),
+        severity: SEVERITY.get(info.level) || 'Information',
+        properties,
+      });
+      if (info.level === 'error') {
+        this.client.trackException({ exception: new Error(info.event || String(info.message)), properties });
+      }
+    }
+    callback();
+  }
+}
+
+module.exports = { AzureTransport, toDimensions, SEVERITY };
