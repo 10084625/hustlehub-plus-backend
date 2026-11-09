@@ -12,3 +12,29 @@ const notFound = (req, res, next) => {
   error.isOperational = true;
   next(error);
 };
+
+/**
+ * Translates known library errors into safe operational errors.
+ */
+const normaliseError = (err) => {
+  // Malformed JSON body sent to express.json()
+  if (err.type === 'entity.parse.failed') {
+    return { statusCode: 400, message: 'Request body is not valid JSON.', isOperational: true };
+  }
+  if (err.type === 'entity.too.large') {
+    return { statusCode: 413, message: 'Request body is too large.', isOperational: true };
+  }
+  // Mongoose: invalid ObjectId and similar casting problems
+  if (err.name === 'CastError') {
+    return { statusCode: 400, message: 'One of the supplied values has an invalid format.', isOperational: true };
+  }
+  // Mongoose schema validation that slipped past express-validator
+  if (err.name === 'ValidationError') {
+    return { statusCode: 400, message: 'Some of the supplied data is invalid.', isOperational: true };
+  }
+  // MongoDB duplicate key (e.g. username or email already taken)
+  if (err.code === 11000) {
+    return { statusCode: 409, message: 'That record already exists.', isOperational: true };
+  }
+  return err;
+};
