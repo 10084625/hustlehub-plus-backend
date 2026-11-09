@@ -53,4 +53,50 @@ export default function AccountPage() {
       setBusy(false);
     }
   };
+
+return (
+    <>
+      <div className="page-head">
+        <h1>Account security</h1>
+      </div>
+      <Alert>{error}</Alert>
+
+      <div className="account-grid">
+        <section className="panel" aria-labelledby="sessions-heading">
+          <h2 id="sessions-heading">Your sessions</h2>
+          <p>
+            Signed in as <strong>{user.username}</strong> <span className="role-badge cap">{user.role}</span>
+          </p>
+          <p className="fine-print">
+            If you used a shared computer or see activity you do not recognise, sign out everywhere. Every device will need to sign
+            in again.
+          </p>
+          <button type="button" className="btn btn-danger" onClick={endAll} disabled={busy}>
+            {busy ? 'Signing out…' : 'Sign out on every device'}
+          </button>
+        </section>
+
+        <section className="panel" aria-labelledby="activity-heading">
+          <h2 id="activity-heading">Recent activity</h2>
+          {!activity ? (
+            <Loading label="Loading activity" />
+          ) : activity.length === 0 ? (
+            <Empty title="No activity recorded yet." />
+          ) : (
+            <ul className="activity">
+              {activity.map((a) => (
+                <li key={a.id} className={a.event.includes('failed') || a.event.includes('lockout') ? 'is-warning' : ''}>
+                  <span className="activity-what">{EVENT_TEXT[a.event] ?? a.event}</span>
+                  <span className="activity-meta">
+                    {formatDateTime(a.at)}
+                    {a.ip ? `, from ${a.ip}` : ''}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      </div>
+    </>
+  );
 }
