@@ -24,3 +24,16 @@ const generateToken = (user) =>
     issuer: config.jwt.issuer,
     audience: config.jwt.audience,
   });
+  /**
+ * Verifies a JWT. Part 1 feedback fix: verification now pins the algorithm
+ * list, issuer and audience instead of only checking the signature.
+ * Throws if any check fails.
+ */
+const verifyToken = (token) =>
+  jwt.verify(token, config.jwt.secret, {
+    algorithms: [config.jwt.algorithm],
+    issuer: config.jwt.issuer,
+    audience: config.jwt.audience,
+  });
+
+module.exports = { generateToken, verifyToken };
