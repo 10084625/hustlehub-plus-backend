@@ -1,3 +1,6 @@
+// References: [3] RFC 7519 JWT, [4] RFC 8725 JWT Best Current Practices
+// (pinning algorithm, issuer and audience), [12] jsonwebtoken.
+// README section 16.
 const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 
