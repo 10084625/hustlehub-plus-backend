@@ -27,11 +27,13 @@ export class ApiError extends Error {
   }
 }
 
-const FRIENDLY = {
-  0: 'We could not reach the server. Check your connection and try again.',
-  429: 'You are doing that too often. Please wait a few minutes and try again.',
-  500: 'Something went wrong on our side. Please try again shortly.',
-};
+// A Map keyed by status code (static analysis fix: no obj[value] lookups).
+const FRIENDLY = new Map([
+  [0, 'We could not reach the server. Check your connection and try again.'],
+  [423, 'This account is temporarily locked. Please try again later.'],
+  [429, 'You are doing that too often. Please wait a few minutes and try again.'],
+  [500, 'Something went wrong on our side. Please try again shortly.'],
+]);
 
 export async function request(path, { method = 'GET', body } = {}) {
   const headers = { Accept: 'application/json' };
@@ -48,7 +50,7 @@ export async function request(path, { method = 'GET', body } = {}) {
       cache: 'no-store',
     });
   } catch {
-    throw new ApiError(FRIENDLY[0], 0);
+    throw new ApiError(FRIENDLY.get(0), 0);
   }
 
   let payload = null;
