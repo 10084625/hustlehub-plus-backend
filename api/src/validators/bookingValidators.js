@@ -34,3 +34,33 @@ const taxEstimateValidation = validate({ query: ['ageGroup'] }, [
     .isIn(AGE_GROUPS)
     .withMessage(`ageGroup must be one of: ${AGE_GROUPS.join(', ')}.`),
 ]);
+
+// Part 3: admin audit log filters.
+// An event prefix is 1 to 4 dot-separated words of lower-case letters and
+// underscores ("auth", "auth.login"). Checked by splitting on dots and
+// testing each simple part, instead of one regex with a repeated group,
+// which ESLint's safe-regex rule flagged (static analysis finding fix).
+const isEventPrefix = (value) => {
+  const parts = String(value).split('.');
+  return parts.length <= 4 && parts.every((p) => /^[a-z_]{1,30}$/.test(p));
+};
+
+const auditLogValidation = validate({ query: ['level', 'event', 'limit'] }, [
+  query('level').optional().isIn(LEVELS).withMessage(`level must be one of: ${LEVELS.join(', ')}.`),
+  query('event')
+    .optional()
+    .isString()
+    .bail()
+    .custom(isEventPrefix)
+    .withMessage('event must be an event name or prefix such as "auth" or "auth.login".'),
+  query('limit').optional().isInt({ min: 1, max: 200 }).withMessage('limit must be between 1 and 200.').toInt(),
+]);
+
+module.exports = {
+  createBookingValidation,
+  bookingIdValidation,
+  userIdValidation,
+  noInputValidation,
+  taxEstimateValidation,
+  auditLogValidation,
+};
