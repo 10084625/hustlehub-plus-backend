@@ -29,3 +29,23 @@ const loadVerifiedTransactions = async (req) => {
   }
   return { transactions: usable, integrity };
 };
+
+/**
+ * GET /api/income/summary - freelancer only.
+ *
+ * Income is calculated from the freelancer's transaction records (not from
+ * bookings or gigs), so the figure always matches the financial ledger.
+ */
+const getIncomeSummary = async (req, res, next) => {
+  try {
+    const { transactions, integrity } = await loadVerifiedTransactions(req);
+
+    const totals = transactions.reduce(
+      (acc, t) => {
+        acc.grossIncome += t.amount;
+        acc.platformFees += t.platformFee;
+        acc.netIncome += t.freelancerEarnings;
+        return acc;
+      },
+      { grossIncome: 0, platformFees: 0, netIncome: 0 }
+    );
