@@ -30,6 +30,7 @@ export default function App() {
           <Route path="gigs/:id" element={<GigDetailPage />} />
           <Route path="account" element={<AccountPage />} />
         </Route>
+
         <Route element={<ProtectedRoute roles={['client', 'freelancer']} />}>
           <Route path="bookings" element={<BookingsPage />} />
           <Route path="transactions" element={<TransactionsPage />} />
