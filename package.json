@@ -1,10 +1,13 @@
 {
   "name": "hustlehub-plus",
   "private": true,
-  "description": "HustleHub+ secure freelance marketplace (MERN). Convenience scripts that run the api and client workspaces.",
+  "description": "HustleHub+ secure freelance marketplace (MERN). Convenience scripts for the api and client folders.",
   "scripts": {
     "install:all": "npm --prefix api install && npm --prefix client install",
+    "lint": "npm --prefix api run lint && npm --prefix client run lint",
     "test": "npm --prefix api test && npm --prefix client test",
-    "test:api": "npm --prefix api run test:api"
+    "test:api": "npm --prefix api run test:api",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
   }
 }
