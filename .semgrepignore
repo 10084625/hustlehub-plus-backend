@@ -1,0 +1,9 @@
+# Folders Semgrep should not scan (dependencies, build output, generated
+# evidence, and test files that contain deliberate attack payloads)
+node_modules/
+dist/
+coverage/
+docs/
+postman/
+api/tests/
+client/src/test/

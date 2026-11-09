@@ -16,4 +16,10 @@ export default function ProtectedRoute({ roles }) {
   return <Outlet />;
 }
 
-export const homeFor = (role) => ({ freelancer: '/dashboard', admin: '/admin' })[role] ?? '/gigs';
+// A Map lookup instead of obj[role]: a role value such as "__proto__" or
+// "constructor" can never reach Object.prototype (ESLint security finding fix).
+const HOME = new Map([
+  ['freelancer', '/dashboard'],
+  ['admin', '/admin'],
+]);
+export const homeFor = (role) => HOME.get(role) ?? '/gigs';

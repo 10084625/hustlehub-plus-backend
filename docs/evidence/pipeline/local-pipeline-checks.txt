@@ -1,0 +1,11 @@
+$ actionlint .github/workflows/ci.yml
+OK: no problems found
+
+$ gitleaks detect --no-git
+[90m10:49AM[0m [32mINF[0m scan completed in 1.92s
+[90m10:49AM[0m [32mINF[0m no leaks found
+
+$ npm audit --omit=dev (api)
+found 0 vulnerabilities
+$ npm audit --omit=dev (client)
+found 0 vulnerabilities

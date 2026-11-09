@@ -1,0 +1,98 @@
+# HustleHub+ full stack (Part 3)
+#
+#   cp .env.example .env      (then fill in the secrets, see README 7.4)
+#   docker compose up --build
+#
+# Open https://localhost:3000. The API is also published on
+# https://localhost:5000 for Postman/Newman. MongoDB is NOT published: it can
+# only be reached by the API on the private "backend" network.
+
+name: hustlehub
+
+services:
+  # One-off job: creates the shared self-signed certificate if it is missing.
+  certs:
+    image: alpine:3.21
+    command: ["/bin/sh", "/make-certs.sh"]
+    volumes:
+      - ./api/certs:/certs
+      - ./docker/make-certs.sh:/make-certs.sh:ro
+    restart: "no"
+
+  mongo:
+    image: mongo:7.0
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:?Set MONGO_ROOT_USERNAME in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?Set MONGO_ROOT_PASSWORD in .env}
+    volumes:
+      - mongo-data:/data/db
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  api:
+    build: ./api
+    image: hustlehub-api:latest
+    restart: unless-stopped
+    depends_on:
+      certs:
+        condition: service_completed_successfully
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: "5000"
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/hustlehub?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env}
+      LEDGER_HMAC_SECRET: ${LEDGER_HMAC_SECRET:?Set LEDGER_HMAC_SECRET in .env}
+      CORS_ORIGIN: https://localhost:3000
+      SSL_KEY_PATH: /app/certs/key.pem
+      SSL_CERT_PATH: /app/certs/cert.pem
+      LOG_LEVEL: ${LOG_LEVEL:-http}
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ${APPLICATIONINSIGHTS_CONNECTION_STRING:-}
+      SEED_ADMIN_ON_START: "true"
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-platform_admin}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@hustlehub.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+    volumes:
+      - ./api/certs:/app/certs:ro
+      - api-logs:/app/logs
+    ports:
+      - "5000:5000"
+    networks: [backend, frontend]
+    # Container hardening: read-only filesystem, no Linux capabilities, no
+    # privilege escalation. Only the logs volume and /tmp are writable.
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+  client:
+    build: ./client
+    image: hustlehub-client:latest
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./api/certs:/etc/nginx/certs:ro
+    ports:
+      - "3000:8443"
+    networks: [frontend]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  backend: {}
+  frontend: {}
+
+volumes:
+  mongo-data: {}
+  api-logs: {}

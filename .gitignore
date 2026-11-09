@@ -3,18 +3,28 @@ node_modules/
 
 # Environment variables (NEVER commit secrets)
 .env
+.env.*
+!.env.example
 
-# SSL certificates (regenerate locally, never commit private keys)
-certs/*.pem
-certs/*.key
-certs/*.crt
+# SSL certificates and private keys, in ANY folder (Part 3 fix: the old
+# pattern "certs/*.pem" only matched a certs folder at the repository root,
+# so api/certs/key.pem was not ignored. Found by the Semgrep secrets scan.)
+**/certs/
+*.pem
+*.key
+*.crt
 
-# Local "database" (file-based storage) - regenerated automatically at runtime
-src/data/users.json
-
-# Logs
+# Logs (Part 3: the API writes logs/app.log and logs/error.log)
+logs/
 *.log
 npm-debug.log*
+
+# Build and test output
+client/dist/
+coverage/
+
+# Local "database" from Part 1 (file-based storage)
+**/src/data/users.json
 
 # OS files
 .DS_Store

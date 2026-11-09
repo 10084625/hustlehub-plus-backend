@@ -11,6 +11,7 @@ import TransactionsPage from './pages/TransactionsPage';
 import FreelancerDashboard from './pages/FreelancerDashboard';
 import AdminPage from './pages/AdminPage';
 import NotFoundPage from './pages/NotFoundPage';
+import AccountPage from './pages/AccountPage';
 
 function Home() {
   const { isAuthenticated, user } = useAuth();
@@ -24,11 +25,12 @@ export default function App() {
         <Route index element={<Home />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="register" element={<RegisterPage />} />
-
         <Route element={<ProtectedRoute />}>
           <Route path="gigs" element={<BrowseGigsPage />} />
           <Route path="gigs/:id" element={<GigDetailPage />} />
+          <Route path="account" element={<AccountPage />} />
         </Route>
+
         <Route element={<ProtectedRoute roles={['client', 'freelancer']} />}>
           <Route path="bookings" element={<BookingsPage />} />
           <Route path="transactions" element={<TransactionsPage />} />

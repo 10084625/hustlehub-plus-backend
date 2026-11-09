@@ -5,13 +5,14 @@ import GigForm from '../components/GigForm';
 import PriceTag from '../components/PriceTag';
 import Alert from '../components/Alert';
 import { Empty, Loading } from '../components/States';
+import TaxPanel from '../components/TaxPanel';
 import { categoryLabel, formatMonth, formatRand } from '../utils/format';
 
 function IncomePanel({ income }) {
   const max = Math.max(1, ...income.byMonth.map((m) => m.netIncome));
   return (
     <section className="panel income" aria-labelledby="income-heading">
-      <h2 id="income-heading">Income</h2>
+      <h2 id="income-heading">All-time income</h2>
       <p className="income-net">
         <span className="mono-num">{formatRand(income.netIncome)}</span>
         <span className="income-net-label">earned after platform fees</span>
@@ -43,7 +44,11 @@ function IncomePanel({ income }) {
           ))}
         </ul>
       )}
-      <p className="fine-print">Tax estimates arrive with the next release.</p>
+      {income.integrity?.excluded > 0 && (
+        <p className="fine-print" role="status">
+          {income.integrity.excluded} record{income.integrity.excluded === 1 ? '' : 's'} failed an integrity check and {income.integrity.excluded === 1 ? 'was' : 'were'} left out.
+        </p>
+      )}
     </section>
   );
 }
@@ -101,7 +106,6 @@ export default function FreelancerDashboard() {
   };
 
   const remove = async (gig) => {
-    // eslint-disable-next-line no-alert
     if (!window.confirm(`Delete "${gig.title}"? Existing bookings are kept.`)) return;
     try {
       await api.deleteGig(gig.id);
@@ -119,6 +123,8 @@ export default function FreelancerDashboard() {
       </div>
       <Alert>{error}</Alert>
       <Alert kind="success">{message}</Alert>
+
+      <TaxPanel refreshKey={income} />
 
       <div className="dash">
         {income ? <IncomePanel income={income} /> : <Loading label="Loading income" />}

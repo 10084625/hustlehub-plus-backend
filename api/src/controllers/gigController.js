@@ -2,6 +2,7 @@ const { trusted } = require('mongoose');
 const { Gig } = require('../models/Gig');
 const { Booking } = require('../models/Booking');
 const { isOwnerOrAdmin, notFound } = require('../utils/ownership');
+const { logEvent } = require('../utils/audit');
 
 const PUBLIC_FREELANCER_FIELDS = 'username';
 
@@ -45,6 +46,7 @@ const listGigs = async (req, res, next) => {
     return next(err);
   }
 };
+
 /**
  * GET /api/gigs/mine - freelancer only. Own gigs including paused ones.
  */
@@ -76,6 +78,7 @@ const getGig = async (req, res, next) => {
 const createGig = async (req, res, next) => {
   try {
     const gig = await Gig.create({ ...req.validated.body, freelancer: req.user.id });
+    logEvent('info', 'gig.created', req, { gig: gig.id, price: gig.price, category: gig.category });
     return res.status(201).json({ success: true, message: 'Gig created successfully.', data: { gig } });
   } catch (err) {
     return next(err);
@@ -95,6 +98,7 @@ const updateGig = async (req, res, next) => {
       { new: true, runValidators: true }
     );
     if (!gig) return next(notFound('Gig'));
+    logEvent('info', 'gig.updated', req, { gig: gig.id, fields: Object.keys(req.validated.body) });
     return res.status(200).json({ success: true, message: 'Gig updated successfully.', data: { gig } });
   } catch (err) {
     return next(err);
@@ -113,6 +117,11 @@ const deleteGig = async (req, res, next) => {
     const gig = await Gig.findOneAndDelete(filter);
     if (!gig) return next(notFound('Gig'));
     const bookingCount = await Booking.countDocuments({ gig: gig._id });
+    logEvent(req.user.role === 'admin' ? 'warn' : 'info', req.user.role === 'admin' ? 'gig.removed_by_admin' : 'gig.deleted', req, {
+      gig: gig.id,
+      owner: gig.freelancer.toString(),
+      bookingsPreserved: bookingCount,
+    });
     return res.status(200).json({
       success: true,
       message: 'Gig deleted successfully.',

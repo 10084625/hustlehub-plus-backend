@@ -1,41 +1,63 @@
+(!) Your Vite config uses features that are unsupported by `configLoader: 'native'`, which is planned to become the default in a future major version of Vite:
+  - `__dirname` (vite.config.js:12:30). Use `import.meta.dirname` instead
+Set `VITE_CONFIG_NATIVE_IGNORE_WARNING=true` to suppress this warning.
 
-> hustlehub-plus-client@2.0.0 test:report
-> vitest run --reporter=verbose --reporter=junit --outputFile.junit=../docs/evidence/frontend-test-results.xml
+[1m[30m[46m RUN [49m[39m[22m [36mv5.1.0 [39m[90mclient[39m
 
+ [32m✓[39m src/test/RegisterPage.test.jsx[2m > [22mRegisterPage[2m > [22moffers only client and freelancer roles (never admin)[32m 148[2mms[22m[39m
+ [32m✓[39m src/test/RegisterPage.test.jsx[2m > [22mRegisterPage[2m > [22mflags a weak password and mismatched confirmation[33m 398[2mms[22m[39m
+ [32m✓[39m src/test/RegisterPage.test.jsx[2m > [22mRegisterPage[2m > [22mrejects a username with HTML or symbols[33m 377[2mms[22m[39m
+ [32m✓[39m src/test/RegisterPage.test.jsx[2m > [22mRegisterPage[2m > [22msends exactly the documented fields with the chosen role[33m 369[2mms[22m[39m
+ [32m✓[39m src/test/RegisterPage.test.jsx[2m > [22mRegisterPage[2m > [22mshows a duplicate-account message from the API[32m 267[2mms[22m[39m
+ [32m✓[39m src/test/Gigs.test.jsx[2m > [22mGigCard[2m > [22mrenders title, price, category and freelancer[32m 88[2mms[22m[39m
+ [32m✓[39m src/test/Gigs.test.jsx[2m > [22mGigCard[2m > [22mshows malicious text as plain text instead of running it (XSS)[32m 10[2mms[22m[39m
+ [32m✓[39m src/test/Gigs.test.jsx[2m > [22mPriceTag[2m > [22mformats rand values with two decimals[32m 3[2mms[22m[39m
+ [32m✓[39m src/test/Gigs.test.jsx[2m > [22mGigForm[2m > [22mblocks submission and explains every invalid field[32m 188[2mms[22m[39m
+ [32m✓[39m src/test/Gigs.test.jsx[2m > [22mGigForm[2m > [22msubmits clean, typed values[33m 574[2mms[22m[39m
+ [32m✓[39m src/test/Gigs.test.jsx[2m > [22mGigForm[2m > [22mshows the API error if saving fails[33m 422[2mms[22m[39m
+ [32m✓[39m src/test/LoginPage.test.jsx[2m > [22mLoginPage[2m > [22mrenders the sign-in form[32m 100[2mms[22m[39m
+ [32m✓[39m src/test/LoginPage.test.jsx[2m > [22mLoginPage[2m > [22mshows validation errors and does not call the API when fields are empty[32m 61[2mms[22m[39m
+ [32m✓[39m src/test/LoginPage.test.jsx[2m > [22mLoginPage[2m > [22mrejects a malformed email before sending anything[32m 171[2mms[22m[39m
+ [32m✓[39m src/test/LoginPage.test.jsx[2m > [22mLoginPage[2m > [22mshows the API message on failed login and clears the password[32m 182[2mms[22m[39m
+ [32m✓[39m src/test/LoginPage.test.jsx[2m > [22mLoginPage[2m > [22mnever shows raw server errors to the user[32m 219[2mms[22m[39m
+ [32m✓[39m src/test/LoginPage.test.jsx[2m > [22mLoginPage[2m > [22ma freelancer is sent to the dashboard after signing in[32m 234[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: freelancer tax and income dashboard[2m > [22mshows the tax year, the four headline figures and the below-threshold message[32m 242[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: freelancer tax and income dashboard[2m > [22mexplains the method step by step with the bracket table[32m 108[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: freelancer tax and income dashboard[2m > [22mchanging the age group asks the API again with the new age group[32m 169[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: freelancer tax and income dashboard[2m > [22mwarns the freelancer when a record failed the integrity check[32m 77[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: freelancer tax and income dashboard[2m > [22man API error is shown safely instead of the panel[32m 19[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: charts[2m > [22mmonthly chart draws all 12 months with an accessible data table[32m 84[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: charts[2m > [22mmonthly chart shows an empty message when there is no income[32m 16[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: charts[2m > [22maxis maximum is rounded up to a tidy number[32m 0[2mms[22m[39m
+ [32m✓[39m src/test/TaxDashboard.test.jsx[2m > [22mPart 3: charts[2m > [22mmoney split shows each share as a percentage of what clients paid[32m 12[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: server-side sign-out[2m > [22mSign out revokes the token on the API, clears the session and returns to login[32m 140[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: server-side sign-out[2m > [22mthe session is still cleared if the API cannot be reached[32m 34[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: server-side sign-out[2m > [22mevery role sees an Account link[32m 25[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: account security page[2m > [22mlists recent activity in plain words and highlights failed sign-ins[32m 44[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: account security page[2m > [22m"Sign out on every device" calls logout-all after confirming[32m 43[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: account security page[2m > [22mnothing happens if the user cancels the confirmation[32m 25[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: admin security monitoring[2m > [22mshows the audit log and the last-24-hour security counts[32m 37[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: admin security monitoring[2m > [22mfiltering by level asks the API for that level only[32m 81[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: admin security monitoring[2m > [22mledger check reports tampered transactions by reference[32m 66[2mms[22m[39m
+ [32m✓[39m src/test/SecurityFeatures.test.jsx[2m > [22mPart 3: admin security monitoring[2m > [22mledger check confirms an intact ledger[32m 41[2mms[22m[39m
+ [32m✓[39m src/test/Booking.test.jsx[2m > [22mBooking a gig[2m > [22ma client books a gig and sees the receipt with the transaction reference[33m 358[2mms[22m[39m
+ [32m✓[39m src/test/Booking.test.jsx[2m > [22mBooking a gig[2m > [22ma freelancer sees the gig but cannot book it[32m 10[2mms[22m[39m
+ [32m✓[39m src/test/Booking.test.jsx[2m > [22mBooking a gig[2m > [22ma rate-limited booking shows the friendly 429 message[32m 65[2mms[22m[39m
+ [32m✓[39m src/test/Booking.test.jsx[2m > [22mBooking a gig[2m > [22man invalid gig id in the URL never reaches the API[32m 15[2mms[22m[39m
+ [32m✓[39m src/test/ProtectedRoute.test.jsx[2m > [22mProtectedRoute and role-based navigation[2m > [22msigned-out visitors are sent to login[32m 61[2mms[22m[39m
+ [32m✓[39m src/test/ProtectedRoute.test.jsx[2m > [22mProtectedRoute and role-based navigation[2m > [22man expired session counts as signed out[32m 12[2mms[22m[39m
+ [32m✓[39m src/test/ProtectedRoute.test.jsx[2m > [22mProtectedRoute and role-based navigation[2m > [22ma client cannot open an admin-only page[32m 15[2mms[22m[39m
+ [32m✓[39m src/test/ProtectedRoute.test.jsx[2m > [22mProtectedRoute and role-based navigation[2m > [22mthe right role gets in[32m 10[2mms[22m[39m
+ [32m✓[39m src/test/ProtectedRoute.test.jsx[2m > [22mProtectedRoute and role-based navigation[2m > [22mnavigation shows freelancer links only to freelancers[32m 93[2mms[22m[39m
+ [32m✓[39m src/test/ProtectedRoute.test.jsx[2m > [22mProtectedRoute and role-based navigation[2m > [22msigning out clears the stored session[32m 59[2mms[22m[39m
 
- RUN  v2.1.9 /home/claude/work/repo/client
+[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[32m46 passed[39m[22m[90m (46)[39m
+[2m   Start at [22m 14:04:15
+[2m   Duration [22m 13.57s[2m (tests 46%, environment 27%, import 13%, setup 11%, transform 2%, worker 1%)[22m
 
- ✓ src/test/Gigs.test.jsx > GigCard > renders title, price, category and freelancer
- ✓ src/test/Gigs.test.jsx > GigCard > shows malicious text as plain text instead of running it (XSS)
- ✓ src/test/Gigs.test.jsx > PriceTag > formats rand values with two decimals
- ✓ src/test/Gigs.test.jsx > GigForm > blocks submission and explains every invalid field
- ✓ src/test/Gigs.test.jsx > GigForm > submits clean, typed values 452ms
- ✓ src/test/Gigs.test.jsx > GigForm > shows the API error if saving fails 348ms
- ✓ src/test/LoginPage.test.jsx > LoginPage > renders the sign-in form
- ✓ src/test/LoginPage.test.jsx > LoginPage > shows validation errors and does not call the API when fields are empty
- ✓ src/test/LoginPage.test.jsx > LoginPage > rejects a malformed email before sending anything
- ✓ src/test/LoginPage.test.jsx > LoginPage > shows the API message on failed login and clears the password
- ✓ src/test/LoginPage.test.jsx > LoginPage > never shows raw server errors to the user
- ✓ src/test/LoginPage.test.jsx > LoginPage > a freelancer is sent to the dashboard after signing in
- ✓ src/test/Booking.test.jsx > Booking a gig > a client books a gig and sees the receipt with the transaction reference
- ✓ src/test/Booking.test.jsx > Booking a gig > a freelancer sees the gig but cannot book it
- ✓ src/test/Booking.test.jsx > Booking a gig > a rate-limited booking shows the friendly 429 message
- ✓ src/test/Booking.test.jsx > Booking a gig > an invalid gig id in the URL never reaches the API
- ✓ src/test/RegisterPage.test.jsx > RegisterPage > offers only client and freelancer roles (never admin)
- ✓ src/test/RegisterPage.test.jsx > RegisterPage > flags a weak password and mismatched confirmation 343ms
- ✓ src/test/RegisterPage.test.jsx > RegisterPage > rejects a username with HTML or symbols
- ✓ src/test/RegisterPage.test.jsx > RegisterPage > sends exactly the documented fields with the chosen role 302ms
- ✓ src/test/RegisterPage.test.jsx > RegisterPage > shows a duplicate-account message from the API
- ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > signed-out visitors are sent to login
- ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > an expired session counts as signed out
- ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > a client cannot open an admin-only page
- ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > the right role gets in
- ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > navigation shows freelancer links only to freelancers
- ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > signing out clears the stored session
+[2mEnvironment [22m [33mjsdom was created 7 times[39m[2m · 3.42s total, 27% of tracked time[22m
+[2m            [22m [2mcreate it once per worker with [22m[33mpool: 'vmThreads'[39m[2m (keeps per-file isolation) or [22m[33misolate: false[39m[2m (shares it across files)[22m
+[2m            [22m [2mlearn more: https://vitest.dev/guide/improving-performance#test-environments[22m
 
- Test Files  5 passed (5)
-      Tests  27 passed (27)
-   Start at  06:28:44
-   Duration  8.67s (transform 440ms, setup 919ms, collect 860ms, tests 3.66s, environment 2.06s, prepare 376ms)
-
-JUNIT report written to /home/claude/work/repo/docs/evidence/frontend-test-results.xml
+JUNIT report written to docs/evidence/frontend-test-results.xml

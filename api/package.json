@@ -1,15 +1,21 @@
 {
   "name": "hustlehub-plus-api",
-  "version": "2.0.0",
-  "description": "Secure REST API for HustleHub+ (Part 2: Secure Stack) - auth, RBAC, gigs, bookings, transactions and income tracking on MongoDB.",
+  "version": "3.0.0",
+  "description": "Secure REST API for HustleHub+ (Part 3: DevSecOps, monitoring and finalisation) - auth, RBAC, gigs, bookings, signed transactions, income, tax estimation, logging.",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
+    "lint": "eslint .",
+    "lint:report": "eslint . -f json -o ../docs/evidence/static-analysis/eslint-api.json",
+    "test": "jest --runInBand",
+    "test:coverage": "jest --runInBand --coverage",
     "generate-certs": "bash generate-certs.sh",
     "seed:admin": "node scripts/seedAdmin.js",
-    "test": "jest --runInBand",
-    "test:api": "newman run ../postman/HustleHub-Part2.postman_collection.json -e ../postman/HustleHub-local.postman_environment.json --insecure --reporters cli,htmlextra,junit --reporter-htmlextra-export ../docs/evidence/newman-report.html --reporter-junit-export ../docs/evidence/newman-results.xml"
+    "seed:demo": "node scripts/seedDemo.js",
+    "ledger:sign-legacy": "node scripts/signLegacyTransactions.js",
+    "demo:tamper": "node scripts/tamperDemo.js",
+    "test:api": "newman run ../postman/HustleHub-Part3.postman_collection.json -e ../postman/HustleHub-local.postman_environment.json --insecure --reporters cli,htmlextra,junit --reporter-htmlextra-export ../docs/evidence/newman-report.html --reporter-junit-export ../docs/evidence/newman-results.xml"
   },
   "keywords": [
     "hustlehub",
@@ -21,6 +27,7 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "applicationinsights": "^3.17.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -32,10 +39,15 @@
     "hpp": "^0.2.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "morgan": "^1.10.0",
+    "winston": "^3.19.0",
+    "winston-transport": "^4.9.0",
     "xss": "^1.0.15"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "eslint": "^9.39.5",
+    "eslint-plugin-security": "^3.0.1",
+    "globals": "^15.15.0",
     "jest": "^29.7.0",
     "newman": "^6.2.1",
     "newman-reporter-htmlextra": "^1.23.1",
@@ -49,9 +61,14 @@
     ],
     "setupFiles": [
       "<rootDir>/tests/setupEnv.js"
+    ],
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/server.js"
     ]
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

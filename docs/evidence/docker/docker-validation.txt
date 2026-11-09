@@ -1,0 +1,37 @@
+# Docker configuration checks (run locally)
+
+$ docker compose config --quiet   (with a test .env)
+OK: docker-compose.yml is valid
+
+$ docker compose config   (without .env: refuses to start, secrets are required)
+required variable MONGO_ROOT_USERNAME is missing a value: Set MONGO_ROOT_USERNAME in .env
+
+$ hadolint api/Dockerfile
+OK: no issues
+$ hadolint client/Dockerfile
+OK: no issues
+
+$ nginx -t   (client/nginx.conf with the snippets)
+nginx: the configuration file /tmp/ngx/nginx.conf syntax is ok
+nginx: configuration file /tmp/ngx/nginx.conf test is successful
+
+$ curl -D - https://localhost:3000/dashboard   (frontend container config)
+HTTP/2 200 
+content-security-policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+strict-transport-security: max-age=31536000; includeSubDomains
+x-frame-options: DENY
+x-content-type-options: nosniff
+referrer-policy: strict-origin-when-cross-origin
+permissions-policy: camera=(), microphone=(), geolocation=(), payment=()
+cross-origin-opener-policy: same-origin
+cache-control: no-store
+
+$ curl https://localhost:3000/api/health   (proxied to the api container with verified TLS)
+{"success":true,"message":"HustleHub+ API is running."}
+
+$ openssl x509 -ext subjectAltName   (certificate names)
+X509v3 Subject Alternative Name: 
+    DNS:localhost, DNS:api, IP Address:127.0.0.1
+
+$ node healthcheck.js   (API container HEALTHCHECK, production mode)
+exit code 0 (healthy)

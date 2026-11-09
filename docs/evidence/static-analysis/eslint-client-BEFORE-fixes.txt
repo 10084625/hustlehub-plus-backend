@@ -1,0 +1,23 @@
+
+client/src/components/ParticleBackground.jsx
+  92:19  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  94:21  error  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+client/src/components/ProtectedRoute.jsx
+  19:34  error  Generic Object Injection Sink  security/detect-object-injection
+
+client/src/pages/AccountPage.jsx
+  46:5  warning  Unused eslint-disable directive (no problems were reported from 'no-alert')
+
+client/src/pages/FreelancerDashboard.jsx
+  109:5  warning  Unused eslint-disable directive (no problems were reported from 'no-alert')
+
+client/src/test/helpers.jsx
+  20:28  error  Generic Object Injection Sink  security/detect-object-injection
+
+client/src/utils/validation.js
+  53:13  error  Unsafe Regular Expression  security/detect-unsafe-regex
+
+✖ 7 problems (5 errors, 2 warnings)
+  0 errors and 2 warnings potentially fixable with the `--fix` option.
+

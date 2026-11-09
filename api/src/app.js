@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const hpp = require('hpp');
 
@@ -8,6 +7,8 @@ const config = require('./config/env');
 const { securityHeaders, noStore } = require('./middleware/securityHeaders');
 const { globalLimiter } = require('./middleware/rateLimiters');
 const { notFound, globalErrorHandler } = require('./middleware/errorMiddleware');
+const { requestId, accessLog } = require('./middleware/requestContext');
+const { logEvent } = require('./utils/audit');
 
 const authRoutes = require('./routes/authRoutes');
 const gigRoutes = require('./routes/gigRoutes');
@@ -23,6 +24,10 @@ const app = express();
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
 
+// 0. Part 3: request id + one structured access-log line per request
+app.use(requestId);
+app.use(accessLog);
+
 // 1. Security headers (Helmet + strict CSP) and no-cache for API data
 app.use(securityHeaders);
 app.use(noStore);
@@ -33,6 +38,7 @@ app.use(
     origin: config.cors.origin,
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['X-Request-Id', 'Retry-After', 'RateLimit', 'RateLimit-Policy'],
     maxAge: 600,
   })
 );
@@ -45,16 +51,16 @@ app.use(express.json({ limit: '10kb' }));
 //      body, query and params, blocking NoSQL operator injection
 //      such as { "email": { "$gt": "" } }.
 //    - hpp stops HTTP parameter pollution (?category=a&category=b).
-app.use(mongoSanitize());
+//    - Part 3: every stripped operator is logged as a likely injection attempt.
+app.use(
+  mongoSanitize({
+    onSanitize: ({ req, key }) => logEvent('warn', 'security.injection_attempt', req, { location: key, type: 'nosql_operator' }),
+  })
+);
 app.use(hpp());
 
 // 5. Global rate limit across the whole API
 app.use('/api', globalLimiter);
-
-// 6. Request logging (never logs bodies, so passwords/tokens stay out of logs)
-if (config.nodeEnv !== 'test') {
-  app.use(morgan(config.nodeEnv === 'development' ? 'dev' : 'combined'));
-}
 
 // Routes
 app.get('/api/health', (req, res) => {
