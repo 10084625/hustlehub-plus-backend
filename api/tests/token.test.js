@@ -15,6 +15,14 @@ describe('JWT generation and verification (Part 1 feedback fix)', () => {
     expect(decoded.email).toBeUndefined();
   });
 
+  test('Part 3: each token has a unique id (jti) and the token version (tv)', () => {
+    const a = verifyToken(generateToken({ ...user, tokenVersion: 3 }));
+    const b = verifyToken(generateToken({ ...user, tokenVersion: 3 }));
+    expect(a.jti).toMatch(/^[0-9a-f-]{36}$/);
+    expect(a.jti).not.toBe(b.jti);
+    expect(a.tv).toBe(3);
+  });
+
   test('a token from a different issuer is rejected', () => {
     const forged = jwt.sign({ role: 'admin' }, secret, { subject: 'x', issuer: 'evil', audience: 'hustlehub-plus-client' });
     expect(() => verifyToken(forged)).toThrow(/issuer/);

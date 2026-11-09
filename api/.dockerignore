@@ -1,0 +1,13 @@
+# Keep secrets, local data and test tooling out of the image build context
+node_modules
+.env
+.env.*
+!.env.example
+certs
+logs
+coverage
+tests
+*.log
+Dockerfile
+.dockerignore
+eslint.config.js

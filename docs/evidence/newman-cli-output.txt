@@ -1,37 +1,38 @@
 
-> hustlehub-plus-api@2.0.0 test:api
-> newman run ../postman/HustleHub-Part2.postman_collection.json -e ../postman/HustleHub-local.postman_environment.json --insecure --reporters cli,htmlextra,junit --reporter-htmlextra-export ../docs/evidence/newman-report.html --reporter-junit-export ../docs/evidence/newman-results.xml
+> hustlehub-plus-api@3.0.0 test:api
+> newman run ../postman/HustleHub-Part3.postman_collection.json -e ../postman/HustleHub-local.postman_environment.json --insecure --reporters cli,htmlextra,junit --reporter-htmlextra-export ../docs/evidence/newman-report.html --reporter-junit-export ../docs/evidence/newman-results.xml
 
 newman
 
-HustleHub+ API - Part 2 (Secure Stack)
+HustleHub+ API - Part 3 (DevSecOps, Monitoring and Finalisation)
 
 ❏ 0. Setup (unique users per run)
 ↳ Health check
-  GET https://localhost:5000/api/health [200 OK, 1.1kB, 34ms]
+  GET https://localhost:5000/api/health [200 OK, 1.23kB, 39ms]
   ✓  Status code is 200
   ✓  API running
+  ✓  [Part 3] Response carries a request id for log tracing
 
 ↳ Register freelancer
-  POST https://localhost:5000/api/auth/register [201 Created, 1.62kB, 317ms]
+  POST https://localhost:5000/api/auth/register [201 Created, 1.82kB, 339ms]
   ✓  Status code is 201
   ✓  Success envelope
   ✓  Password hash never returned
   ✓  Role is freelancer and token returned
 
 ↳ Register second freelancer (used for ownership tests)
-  POST https://localhost:5000/api/auth/register [201 Created, 1.62kB, 329ms]
+  POST https://localhost:5000/api/auth/register [201 Created, 1.83kB, 326ms]
   ✓  Status code is 201
   ✓  Success envelope
 
 ↳ Register client (role omitted defaults to client)
-  POST https://localhost:5000/api/auth/register [201 Created, 1.61kB, 325ms]
+  POST https://localhost:5000/api/auth/register [201 Created, 1.81kB, 356ms]
   ✓  Status code is 201
   ✓  Success envelope
   ✓  Defaults to client role
 
 ↳ Login client
-  POST https://localhost:5000/api/auth/login [200 OK, 1.59kB, 303ms]
+  POST https://localhost:5000/api/auth/login [200 OK, 1.79kB, 329ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Password hash never returned
@@ -42,83 +43,83 @@ HustleHub+ API - Part 2 (Secure Stack)
   ✓  JWT has three parts and carries sub/role/iss/aud
 
 ↳ Login admin (seeded account)
-  POST https://localhost:5000/api/auth/login [200 OK, 1.58kB, 319ms]
+  POST https://localhost:5000/api/auth/login [200 OK, 1.79kB, 327ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Role is admin
 
 ❏ 1. Authentication - invalid scenarios
 ↳ Register - duplicate email (409)
-  POST https://localhost:5000/api/auth/register [409 Conflict, 1.12kB, 19ms]
+  POST https://localhost:5000/api/auth/register [409 Conflict, 1.3kB, 8ms]
   ✓  Status code is 409
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Register - missing fields (400)
-  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.17kB, 4ms]
+  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.35kB, 7ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Register - weak password (400)
-  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.23kB, 5ms]
+  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.41kB, 6ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Register - self-assign admin role (400)
-  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.13kB, 7ms]
+  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.31kB, 5ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Register - unexpected field rejected (400) [Part 1 fix]
-  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.15kB, 5ms]
+  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.34kB, 3ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Register - script in username (400)
-  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.14kB, 4ms]
+  POST https://localhost:5000/api/auth/register [400 Bad Request, 1.32kB, 9ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Login - unexpected field rejected (400) [Part 1 fix]
-  POST https://localhost:5000/api/auth/login [400 Bad Request, 1.15kB, 6ms]
+  POST https://localhost:5000/api/auth/login [400 Bad Request, 1.34kB, 11ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Login - NoSQL operator injection (400)
-  POST https://localhost:5000/api/auth/login [400 Bad Request, 1.12kB, 4ms]
+  POST https://localhost:5000/api/auth/login [400 Bad Request, 1.31kB, 5ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Login - wrong password (401, generic message)
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 330ms]
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 358ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Login - unknown email (401, same message)
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 92ms]
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 89ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Login - malformed JSON (400)
-  POST https://localhost:5000/api/auth/login [400 Bad Request, 1.03kB, 6ms]
+  POST https://localhost:5000/api/auth/login [400 Bad Request, 1.22kB, 4ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Profile - valid token (200)
-  GET https://localhost:5000/api/auth/profile [200 OK, 1.33kB, 9ms]
+  GET https://localhost:5000/api/auth/profile [200 OK, 1.46kB, 10ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Password hash never returned
 
 ↳ Profile - no token (401)
-  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.14kB, 3ms]
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.32kB, 3ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
@@ -129,7 +130,7 @@ HustleHub+ API - Part 2 (Secure Stack)
   │ `Using "btoa" is deprecated. Use "require('btoa')" ins
   │ tead.`
   └
-  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.14kB, 4ms]
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.32kB, 4ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
@@ -138,52 +139,52 @@ HustleHub+ API - Part 2 (Secure Stack)
   │ `Using "btoa" is deprecated. Use "require('btoa')" ins
   │ tead.`
   └
-  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.14kB, 3ms]
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.32kB, 3ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ❏ 2. Gigs - CRUD, ownership and validation
 ↳ Create gig - freelancer (201)
-  POST https://localhost:5000/api/gigs [201 Created, 1.48kB, 10ms]
+  POST https://localhost:5000/api/gigs [201 Created, 1.61kB, 15ms]
   ✓  Status code is 201
   ✓  Success envelope
   ✓  Owner is the logged-in freelancer
 
 ↳ Create gig - HTML/script is stripped (201)
-  POST https://localhost:5000/api/gigs [201 Created, 1.43kB, 10ms]
+  POST https://localhost:5000/api/gigs [201 Created, 1.56kB, 11ms]
   ✓  Status code is 201
   ✓  Success envelope
   ✓  No HTML stored
 
 ↳ Create gig - client role forbidden (403)
-  POST https://localhost:5000/api/gigs [403 Forbidden, 1.13kB, 5ms]
+  POST https://localhost:5000/api/gigs [403 Forbidden, 1.32kB, 8ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create gig - no token (401)
-  POST https://localhost:5000/api/gigs [401 Unauthorized, 1.14kB, 3ms]
+  POST https://localhost:5000/api/gigs [401 Unauthorized, 1.32kB, 3ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create gig - invalid values (400)
-  POST https://localhost:5000/api/gigs [400 Bad Request, 1.3kB, 5ms]
+  POST https://localhost:5000/api/gigs [400 Bad Request, 1.48kB, 7ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Create gig - price with 3 decimals (400)
-  POST https://localhost:5000/api/gigs [400 Bad Request, 1.12kB, 5ms]
+  POST https://localhost:5000/api/gigs [400 Bad Request, 1.31kB, 6ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create gig - cannot set owner (400)
-  POST https://localhost:5000/api/gigs [400 Bad Request, 1.15kB, 6ms]
+  POST https://localhost:5000/api/gigs [400 Bad Request, 1.34kB, 7ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Browse gigs - client (200)
-  GET https://localhost:5000/api/gigs [200 OK, 5.23kB, 18ms]
+  GET https://localhost:5000/api/gigs [200 OK, 5.57kB, 21ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Returns gigs with pagination
@@ -191,96 +192,96 @@ HustleHub+ API - Part 2 (Secure Stack)
   ✓  Freelancer email not exposed
 
 ↳ Browse gigs - search + category filter (200)
-  GET https://localhost:5000/api/gigs?search=logo&category=design [200 OK, 2.78kB, 15ms]
+  GET https://localhost:5000/api/gigs?search=logo&category=design [200 OK, 2.88kB, 18ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Filter applied
 
 ↳ Browse gigs - unknown query param (400)
-  GET https://localhost:5000/api/gigs?debug=true [400 Bad Request, 1.15kB, 7ms]
+  GET https://localhost:5000/api/gigs?debug=true [400 Bad Request, 1.34kB, 5ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Browse gigs - limit too high (400)
-  GET https://localhost:5000/api/gigs?limit=5000 [400 Bad Request, 1.11kB, 9ms]
+  GET https://localhost:5000/api/gigs?limit=5000 [400 Bad Request, 1.3kB, 6ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Get gig by id (200)
-  GET https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c5 [200 OK, 1.51kB, 9ms]
+  GET https://localhost:5000/api/gigs/6aeb14cb0e506926118bc89a [200 OK, 1.64kB, 56ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Get gig - invalid id format (400)
-  GET https://localhost:5000/api/gigs/not-an-id [400 Bad Request, 1.1kB, 5ms]
+  GET https://localhost:5000/api/gigs/not-an-id [400 Bad Request, 1.29kB, 7ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Get gig - non-existent id (404)
-  GET https://localhost:5000/api/gigs/000000000000000000000000 [404 Not Found, 1.09kB, 10ms]
+  GET https://localhost:5000/api/gigs/000000000000000000000000 [404 Not Found, 1.28kB, 10ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ My gigs - freelancer (200)
-  GET https://localhost:5000/api/gigs/mine [200 OK, 1.79kB, 7ms]
+  GET https://localhost:5000/api/gigs/mine [200 OK, 1.93kB, 8ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Only own gigs
 
 ↳ My gigs - client forbidden (403)
-  GET https://localhost:5000/api/gigs/mine [403 Forbidden, 1.13kB, 6ms]
+  GET https://localhost:5000/api/gigs/mine [403 Forbidden, 1.32kB, 6ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Update own gig (200)
-  PATCH https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c5 [200 OK, 1.47kB, 9ms]
+  PATCH https://localhost:5000/api/gigs/6aeb14cb0e506926118bc89a [200 OK, 1.61kB, 14ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Price updated
 
 ↳ Update gig - empty body (400)
-  PATCH https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c5 [400 Bad Request, 1.12kB, 11ms]
+  PATCH https://localhost:5000/api/gigs/6aeb14cb0e506926118bc89a [400 Bad Request, 1.31kB, 5ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Update gig - another freelancer's gig (404, no IDOR)
-  PATCH https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c5 [404 Not Found, 1.09kB, 12ms]
+  PATCH https://localhost:5000/api/gigs/6aeb14cb0e506926118bc89a [404 Not Found, 1.28kB, 8ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Delete gig - another freelancer's gig (404, no IDOR)
-  DELETE https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c5 [404 Not Found, 1.09kB, 8ms]
+  DELETE https://localhost:5000/api/gigs/6aeb14cb0e506926118bc89a [404 Not Found, 1.28kB, 6ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Delete gig - client forbidden (403)
-  DELETE https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c5 [403 Forbidden, 1.13kB, 5ms]
+  DELETE https://localhost:5000/api/gigs/6aeb14cb0e506926118bc89a [403 Forbidden, 1.32kB, 10ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Pause own gig (200)
-  PATCH https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c8 [200 OK, 1.42kB, 10ms]
+  PATCH https://localhost:5000/api/gigs/6aeb14cb0e506926118bc8a0 [200 OK, 1.56kB, 12ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Paused gig hidden from clients (404)
-  GET https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c8 [404 Not Found, 1.09kB, 11ms]
+  GET https://localhost:5000/api/gigs/6aeb14cb0e506926118bc8a0 [404 Not Found, 1.28kB, 11ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Delete own gig (200)
-  DELETE https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c8 [200 OK, 1.16kB, 17ms]
+  DELETE https://localhost:5000/api/gigs/6aeb14cb0e506926118bc8a0 [200 OK, 1.3kB, 14ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Deleted gig is gone (404)
-  GET https://localhost:5000/api/gigs/6ac7382f2a556c6ccc9ec2c8 [404 Not Found, 1.09kB, 6ms]
+  GET https://localhost:5000/api/gigs/6aeb14cb0e506926118bc8a0 [404 Not Found, 1.28kB, 9ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ❏ 3. Bookings and transaction recording
 ↳ Create booking - client (201) creates transaction
-  POST https://localhost:5000/api/bookings [201 Created, 1.87kB, 12ms]
+  POST https://localhost:5000/api/bookings [201 Created, 2.01kB, 15ms]
   ✓  Status code is 201
   ✓  Success envelope
   ✓  Booking linked to client and freelancer
@@ -290,335 +291,634 @@ HustleHub+ API - Part 2 (Secure Stack)
   ✓  Fee and earnings add up
 
 ↳ Create booking - freelancer forbidden (403)
-  POST https://localhost:5000/api/bookings [403 Forbidden, 1.13kB, 5ms]
+  POST https://localhost:5000/api/bookings [403 Forbidden, 1.32kB, 6ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create booking - admin forbidden (403)
-  POST https://localhost:5000/api/bookings [403 Forbidden, 1.13kB, 6ms]
+  POST https://localhost:5000/api/bookings [403 Forbidden, 1.32kB, 7ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create booking - price tampering rejected (400)
-  POST https://localhost:5000/api/bookings [400 Bad Request, 1.15kB, 5ms]
+  POST https://localhost:5000/api/bookings [400 Bad Request, 1.34kB, 9ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
   ✓  Message explains the problem
 
 ↳ Create booking - missing gigId (400)
-  POST https://localhost:5000/api/bookings [400 Bad Request, 1.09kB, 6ms]
+  POST https://localhost:5000/api/bookings [400 Bad Request, 1.28kB, 14ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create booking - deleted gig (404)
-  POST https://localhost:5000/api/bookings [404 Not Found, 1.09kB, 10ms]
+  POST https://localhost:5000/api/bookings [404 Not Found, 1.27kB, 6ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Create booking - no token (401)
-  POST https://localhost:5000/api/bookings [401 Unauthorized, 1.14kB, 3ms]
+  POST https://localhost:5000/api/bookings [401 Unauthorized, 1.32kB, 3ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ My bookings - client (200)
-  GET https://localhost:5000/api/bookings/mine [200 OK, 1.53kB, 16ms]
+  GET https://localhost:5000/api/bookings/mine [200 OK, 1.66kB, 14ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Contains the new booking
 
 ↳ My bookings - freelancer sees bookings received (200)
-  GET https://localhost:5000/api/bookings/mine [200 OK, 1.53kB, 13ms]
+  GET https://localhost:5000/api/bookings/mine [200 OK, 1.66kB, 17ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Contains the booking on their gig
 
 ↳ My bookings - other freelancer sees none of it (200)
-  GET https://localhost:5000/api/bookings/mine [200 OK, 1.13kB, 8ms]
+  GET https://localhost:5000/api/bookings/mine [200 OK, 1.26kB, 7ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Does not contain other people's booking
 
 ↳ Get booking - client owner (200)
-  GET https://localhost:5000/api/bookings/6ac738302a556c6ccc9ec2f5 [200 OK, 1.92kB, 41ms]
+  GET https://localhost:5000/api/bookings/6aeb14cc0e506926118bc8f2 [200 OK, 2.05kB, 10ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Includes its transaction
 
 ↳ Get booking - unrelated freelancer (404, no IDOR)
-  GET https://localhost:5000/api/bookings/6ac738302a556c6ccc9ec2f5 [404 Not Found, 1.1kB, 34ms]
+  GET https://localhost:5000/api/bookings/6aeb14cc0e506926118bc8f2 [404 Not Found, 1.28kB, 15ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ All bookings - client forbidden (403)
-  GET https://localhost:5000/api/bookings [403 Forbidden, 1.13kB, 5ms]
+  GET https://localhost:5000/api/bookings [403 Forbidden, 1.32kB, 5ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ All bookings - admin (200)
-  GET https://localhost:5000/api/bookings [200 OK, 6.67kB, 15ms]
+  GET https://localhost:5000/api/bookings [200 OK, 16.4kB, 15ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Complete booking - client forbidden (403)
-  PATCH https://localhost:5000/api/bookings/6ac738302a556c6ccc9ec2f5/complete [403 Forbidden, 1.13kB, 5ms]
+  PATCH https://localhost:5000/api/bookings/6aeb14cc0e506926118bc8f2/complete [403 Forbidden, 1.32kB, 9ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Complete booking - other freelancer (404)
-  PATCH https://localhost:5000/api/bookings/6ac738302a556c6ccc9ec2f5/complete [404 Not Found, 1.1kB, 8ms]
+  PATCH https://localhost:5000/api/bookings/6aeb14cc0e506926118bc8f2/complete [404 Not Found, 1.29kB, 45ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Complete booking - owning freelancer (200)
-  PATCH https://localhost:5000/api/bookings/6ac738302a556c6ccc9ec2f5/complete [200 OK, 1.46kB, 9ms]
+  PATCH https://localhost:5000/api/bookings/6aeb14cc0e506926118bc8f2/complete [200 OK, 1.59kB, 20ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Status completed
 
 ❏ 4. Transactions and income tracking
 ↳ My transactions - client (200)
-  GET https://localhost:5000/api/transactions/mine [200 OK, 1.65kB, 18ms]
+  GET https://localhost:5000/api/transactions/mine [200 OK, 1.79kB, 11ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Contains the booking transaction
 
 ↳ My transactions - freelancer (200)
-  GET https://localhost:5000/api/transactions/mine [200 OK, 1.65kB, 17ms]
+  GET https://localhost:5000/api/transactions/mine [200 OK, 1.79kB, 15ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  All belong to this freelancer
 
 ↳ My transactions - other freelancer has none (200)
-  GET https://localhost:5000/api/transactions/mine [200 OK, 1.13kB, 13ms]
+  GET https://localhost:5000/api/transactions/mine [200 OK, 1.27kB, 8ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Empty
 
 ↳ Income summary - freelancer (200)
-  GET https://localhost:5000/api/income/summary [200 OK, 1.29kB, 9ms]
+  GET https://localhost:5000/api/income/summary [200 OK, 1.49kB, 9ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Income matches the booking (R900 gross, 10% fee, R810 net)
   ✓  Monthly breakdown present
 
 ↳ Income summary - client forbidden (403)
-  GET https://localhost:5000/api/income/summary [403 Forbidden, 1.13kB, 6ms]
+  GET https://localhost:5000/api/income/summary [403 Forbidden, 1.32kB, 7ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Income summary - no token (401)
-  GET https://localhost:5000/api/income/summary [401 Unauthorized, 1.13kB, 3ms]
+  GET https://localhost:5000/api/income/summary [401 Unauthorized, 1.32kB, 2ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ All transactions - admin (200)
-  GET https://localhost:5000/api/transactions [200 OK, 8.4kB, 28ms]
+  GET https://localhost:5000/api/transactions [200 OK, 22kB, 53ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ All transactions - freelancer forbidden (403)
-  GET https://localhost:5000/api/transactions [403 Forbidden, 1.13kB, 6ms]
+  GET https://localhost:5000/api/transactions [403 Forbidden, 1.32kB, 9ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Transactions are read-only - POST not available (404)
-  POST https://localhost:5000/api/transactions [404 Not Found, 1.11kB, 8ms]
+  POST https://localhost:5000/api/transactions [404 Not Found, 1.3kB, 5ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ❏ 5. Admin capabilities
 ↳ Platform stats - admin (200)
-  GET https://localhost:5000/api/admin/stats [200 OK, 1.22kB, 22ms]
+  GET https://localhost:5000/api/admin/stats [200 OK, 1.41kB, 17ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Users list - admin (200)
-  GET https://localhost:5000/api/admin/users [200 OK, 3.99kB, 9ms]
+  GET https://localhost:5000/api/admin/users [200 OK, 5.67kB, 8ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  Password hash never returned
 
 ↳ Users list - client forbidden (403)
-  GET https://localhost:5000/api/admin/users [403 Forbidden, 1.13kB, 7ms]
+  GET https://localhost:5000/api/admin/users [403 Forbidden, 1.32kB, 5ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Users list - freelancer forbidden (403)
-  GET https://localhost:5000/api/admin/users [403 Forbidden, 1.13kB, 6ms]
+  GET https://localhost:5000/api/admin/users [403 Forbidden, 1.32kB, 6ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Admin removes a gig (moderation) - setup gig
-  POST https://localhost:5000/api/gigs [201 Created, 1.47kB, 23ms]
+  POST https://localhost:5000/api/gigs [201 Created, 1.61kB, 13ms]
   ✓  Status code is 201
   ✓  Success envelope
 
 ↳ Admin removes a gig (200)
-  DELETE https://localhost:5000/api/gigs/6ac738302a556c6ccc9ec33c [200 OK, 1.16kB, 11ms]
+  DELETE https://localhost:5000/api/gigs/6aeb14cd0e506926118bc96d [200 OK, 1.3kB, 13ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Suspend user - admin (200)
-  PATCH https://localhost:5000/api/admin/users/6ac7382d2a556c6ccc9ec2b8/status [200 OK, 1.32kB, 13ms]
+  PATCH https://localhost:5000/api/admin/users/6aeb14c90e506926118bc86b/status [200 OK, 1.46kB, 13ms]
   ✓  Status code is 200
   ✓  Success envelope
   ✓  User inactive
 
 ↳ Suspended user's existing token stops working (401)
-  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.13kB, 8ms]
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.32kB, 12ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Suspended user cannot log in (401)
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 333ms]
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 353ms]
   ✓  Status code is 401
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Suspend user - invalid body (400)
-  PATCH https://localhost:5000/api/admin/users/6ac7382d2a556c6ccc9ec2b8/status [400 Bad Request, 1.11kB, 8ms]
+  PATCH https://localhost:5000/api/admin/users/6aeb14c90e506926118bc86b/status [400 Bad Request, 1.3kB, 9ms]
   ✓  Status code is 400
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
 ↳ Reactivate user - admin (200)
-  PATCH https://localhost:5000/api/admin/users/6ac7382d2a556c6ccc9ec2b8/status [200 OK, 1.32kB, 13ms]
+  PATCH https://localhost:5000/api/admin/users/6aeb14c90e506926118bc86b/status [200 OK, 1.46kB, 10ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+
+↳ Reactivated user's OLD token stays invalid (401) [Part 3]
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.31kB, 8ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+  ✓  Message explains the problem
+
+↳ Reactivated user can sign in again (200)
+  POST https://localhost:5000/api/auth/login [200 OK, 1.81kB, 337ms]
   ✓  Status code is 200
   ✓  Success envelope
 
 ↳ Suspend user - client forbidden (403)
-  PATCH https://localhost:5000/api/admin/users/6ac7382d2a556c6ccc9ec2b5/status [403 Forbidden, 1.13kB, 5ms]
+  PATCH https://localhost:5000/api/admin/users/6aeb14c90e506926118bc866/status [403 Forbidden, 1.32kB, 9ms]
   ✓  Status code is 403
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
-❏ 6. Rate limiting (run last)
+❏ 6. Tax estimation and income dashboard (Part 3)
+↳ Tax estimate - freelancer, small income below threshold (200)
+  GET https://localhost:5000/api/income/tax-estimate [200 OK, 3.52kB, 12ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Tax year runs 1 March to end of February
+  ✓  Uses the R810 net income from the booking (after the 10% fee)
+  ✓  Annualised = earned / months elapsed x 12
+  ✓  Below the R95 750 threshold, so no tax
+  ✓  Monthly breakdown covers all 12 months of the tax year
+  ✓  Ledger records verified
+  ✓  Disclaimer is included
+
+↳ Tax setup - freelancer lists a high-value gig (201)
+  POST https://localhost:5000/api/gigs [201 Created, 1.62kB, 15ms]
+  ✓  Status code is 201
+  ✓  Success envelope
+
+↳ Tax setup - client books it (201)
+  POST https://localhost:5000/api/bookings [201 Created, 2kB, 11ms]
+  ✓  Status code is 201
+  ✓  Success envelope
+  ✓  R30 000 platform fee, R270 000 to the freelancer
+
+↳ Tax estimate - figures match an independent SARS calculation (200)
+  GET https://localhost:5000/api/income/tax-estimate [200 OK, 3.67kB, 6ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Taxable income = R270 810
+  ✓  Projected annual income is annualised correctly
+  ✓  Bracket tax matches SARS brackets
+  ✓  Primary rebate R17 235 applied
+  ✓  Annual tax = bracket tax - rebate
+  ✓  Tax so far = earnings so far x effective rate
+  ✓  Take-home + tax = earnings
+  ✓  Monthly set-aside = annual tax / 12
+  ✓  Band breakdown adds up
+  ✓  Monthly bars add up to the total
+
+↳ Tax estimate - age 65 to 74 gets the secondary rebate (200)
+  GET https://localhost:5000/api/income/tax-estimate?ageGroup=65to74 [200 OK, 3.67kB, 12ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Rebate is R17 235 + R9 444
+  ✓  Less tax than under 65
+  ✓  Threshold R148 217
+
+↳ Tax estimate - invalid age group (400)
+  GET https://localhost:5000/api/income/tax-estimate?ageGroup=teen [400 Bad Request, 1.32kB, 5ms]
+  ✓  Status code is 400
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+  ✓  Message explains the problem
+
+↳ Tax estimate - unexpected query parameter (400)
+  GET https://localhost:5000/api/income/tax-estimate?rate=0 [400 Bad Request, 1.34kB, 9ms]
+  ✓  Status code is 400
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+  ✓  Message explains the problem
+
+↳ Tax estimate - client forbidden (403)
+  GET https://localhost:5000/api/income/tax-estimate [403 Forbidden, 1.32kB, 9ms]
+  ✓  Status code is 403
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Tax estimate - admin forbidden (403)
+  GET https://localhost:5000/api/income/tax-estimate [403 Forbidden, 1.32kB, 7ms]
+  ✓  Status code is 403
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Tax estimate - no token (401)
+  GET https://localhost:5000/api/income/tax-estimate [401 Unauthorized, 1.32kB, 2ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Income summary includes ledger integrity (200)
+  GET https://localhost:5000/api/income/summary [200 OK, 1.51kB, 9ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Both bookings counted
+  ✓  All records verified
+
+↳ Transactions never expose their signature (200)
+  GET https://localhost:5000/api/transactions/mine [200 OK, 2.32kB, 10ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  No signature field in responses
+
+❏ 7. Own security features: lockout, sign-out, ledger, audit log (Part 3)
+↳ Lockout setup - register account
+  POST https://localhost:5000/api/auth/register [201 Created, 1.81kB, 355ms]
+  ✓  Status code is 201
+  ✓  Success envelope
+
+↳ Lockout - wrong passwords until locked
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 364ms]
+  ✓  Failed attempt 1 gets the generic 401
+
+Attempting to set next request to Lockout - wrong passwords until locked
+
+↳ Lockout - wrong passwords until locked
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 346ms]
+  ✓  Failed attempt 2 gets the generic 401
+
+Attempting to set next request to Lockout - wrong passwords until locked
+
+↳ Lockout - wrong passwords until locked
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 351ms]
+  ✓  Failed attempt 3 gets the generic 401
+
+Attempting to set next request to Lockout - wrong passwords until locked
+
+↳ Lockout - wrong passwords until locked
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 356ms]
+  ✓  Failed attempt 4 gets the generic 401
+
+Attempting to set next request to Lockout - wrong passwords until locked
+
+↳ Lockout - wrong passwords until locked
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 327ms]
+  ✓  Account locks on the 5th failed attempt
+  ✓  423 explains the lock and gives the remaining time
+  ✓  Retry-After header matches
+
+↳ Lockout - even the CORRECT password is refused while locked (423)
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 6ms]
+  ✓  Status code is 423
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+  ✓  Message explains the problem
+
+↳ Lockout - unknown email locks the same way (no user enumeration)
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 92ms]
+  ✓  Unknown email attempt 1 gets the same 401 message
+
+Attempting to set next request to Lockout - unknown email locks the same way (no user enumeration)
+
+↳ Lockout - unknown email locks the same way (no user enumeration)
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 96ms]
+  ✓  Unknown email attempt 2 gets the same 401 message
+
+Attempting to set next request to Lockout - unknown email locks the same way (no user enumeration)
+
+↳ Lockout - unknown email locks the same way (no user enumeration)
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 109ms]
+  ✓  Unknown email attempt 3 gets the same 401 message
+
+Attempting to set next request to Lockout - unknown email locks the same way (no user enumeration)
+
+↳ Lockout - unknown email locks the same way (no user enumeration)
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 108ms]
+  ✓  Unknown email attempt 4 gets the same 401 message
+
+Attempting to set next request to Lockout - unknown email locks the same way (no user enumeration)
+
+↳ Lockout - unknown email locks the same way (no user enumeration)
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 97ms]
+  ✓  Locks after exactly the same number of attempts as a real account
+  ✓  Same lock message as a real account
+
+↳ Sign-out setup - client signs in on a second device
+  POST https://localhost:5000/api/auth/login [200 OK, 1.79kB, 327ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+
+↳ Sign out - revokes this token (200)
+  POST https://localhost:5000/api/auth/logout [200 OK, 1.24kB, 13ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Message explains the problem
+
+↳ Sign out - the same token is now refused (401)
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.31kB, 6ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+  ✓  Message explains the problem
+
+↳ Sign out - other sessions are not affected (200)
+  GET https://localhost:5000/api/auth/profile [200 OK, 1.46kB, 6ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+
+↳ Sign out - no token (401)
+  POST https://localhost:5000/api/auth/logout [401 Unauthorized, 1.32kB, 3ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Sign out - unexpected body field (400)
+  POST https://localhost:5000/api/auth/logout [400 Bad Request, 1.34kB, 7ms]
+  ✓  Status code is 400
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Sign out everywhere setup - register
+  POST https://localhost:5000/api/auth/register [201 Created, 1.82kB, 332ms]
+  ✓  Status code is 201
+  ✓  Success envelope
+
+↳ Sign out everywhere setup - second device
+  POST https://localhost:5000/api/auth/login [200 OK, 1.8kB, 350ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+
+↳ Sign out everywhere (200)
+  POST https://localhost:5000/api/auth/logout-all [200 OK, 1.26kB, 17ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Message explains the problem
+
+↳ Sign out everywhere - device A refused (401)
+  GET https://localhost:5000/api/auth/profile [401 Unauthorized, 1.31kB, 6ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Sign out everywhere - device B refused too (401)
+  GET https://localhost:5000/api/gigs/mine [401 Unauthorized, 1.31kB, 5ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Sign out everywhere - a NEW sign-in works (200)
+  POST https://localhost:5000/api/auth/login [200 OK, 1.8kB, 338ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+
+↳ Account activity - user sees their own sign-ins (200)
+  GET https://localhost:5000/api/auth/activity [200 OK, 1.85kB, 8ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Has sign-in and sign-out events
+  ✓  Only safe fields returned
+  ✓  No tokens or email addresses in activity
+
+↳ Account activity - no token (401)
+  GET https://localhost:5000/api/auth/activity [401 Unauthorized, 1.32kB, 3ms]
+  ✓  Status code is 401
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Audit log - admin sees the lockout events (200)
+  GET https://localhost:5000/api/admin/audit-logs?event=auth.lockout&limit=20 [200 OK, 4.54kB, 13ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Lockouts were recorded
+  ✓  Filter applied
+  ✓  Emails are masked in the audit trail
+
+↳ Audit log - booking and transaction events recorded (200)
+  GET https://localhost:5000/api/admin/audit-logs?event=transaction&limit=5 [200 OK, 3.65kB, 16ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  transaction.created logged with request id
+
+↳ Audit log - warnings only (200)
+  GET https://localhost:5000/api/admin/audit-logs?level=warn&limit=10 [200 OK, 4.41kB, 12ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Only warn level
+
+↳ Audit log - invalid level (400)
+  GET https://localhost:5000/api/admin/audit-logs?level=debug [400 Bad Request, 1.31kB, 7ms]
+  ✓  Status code is 400
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Audit log - regex injection in event filter rejected (400)
+  GET https://localhost:5000/api/admin/audit-logs?event=.* [400 Bad Request, 1.34kB, 5ms]
+  ✓  Status code is 400
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Audit log - freelancer forbidden (403)
+  GET https://localhost:5000/api/admin/audit-logs [403 Forbidden, 1.32kB, 8ms]
+  ✓  Status code is 403
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Audit log - read-only, DELETE not available (404)
+  DELETE https://localhost:5000/api/admin/audit-logs [404 Not Found, 1.3kB, 7ms]
+  ✓  Status code is 404
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+↳ Ledger integrity check - admin (200)
+  GET https://localhost:5000/api/admin/ledger/verify [200 OK, 1.32kB, 15ms]
+  ✓  Status code is 200
+  ✓  Success envelope
+  ✓  Every transaction checked, none tampered
+
+↳ Ledger integrity check - client forbidden (403)
+  GET https://localhost:5000/api/admin/ledger/verify [403 Forbidden, 1.32kB, 5ms]
+  ✓  Status code is 403
+  ✓  Error uses the safe envelope (success=false, message, nothing internal)
+
+❏ 8. Rate limiting (run last)
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 90ms]
-  ✓  Wrong-password attempt 1 returns 401
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 109ms]
+  ✓  Attempt 1 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 87ms]
-  ✓  Wrong-password attempt 2 returns 401
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 92ms]
+  ✓  Attempt 2 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 87ms]
-  ✓  Wrong-password attempt 3 returns 401
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 103ms]
+  ✓  Attempt 3 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 85ms]
-  ✓  Wrong-password attempt 4 returns 401
+  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.29kB, 91ms]
+  ✓  Attempt 4 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 85ms]
-  ✓  Wrong-password attempt 5 returns 401
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 90ms]
+  ✓  Attempt 5 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 84ms]
-  ✓  Wrong-password attempt 6 returns 401
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 8ms]
+  ✓  Attempt 6 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 89ms]
-  ✓  Wrong-password attempt 7 returns 401
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 13ms]
+  ✓  Attempt 7 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 84ms]
-  ✓  Wrong-password attempt 8 returns 401
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 10ms]
+  ✓  Attempt 8 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 84ms]
-  ✓  Wrong-password attempt 9 returns 401
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 6ms]
+  ✓  Attempt 9 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [401 Unauthorized, 1.1kB, 85ms]
-  ✓  Wrong-password attempt 10 returns 401
+  POST https://localhost:5000/api/auth/login [423 Locked, 1.4kB, 5ms]
+  ✓  Attempt 10 refused with 401, or 423 once the email is locked [Part 3 lockout]
 
 Attempting to set next request to Rate limit - login brute force
 
 ↳ Rate limit - login brute force
-  POST https://localhost:5000/api/auth/login [429 Too Many Requests, 1.18kB, 3ms]
+  POST https://localhost:5000/api/auth/login [429 Too Many Requests, 1.32kB, 8ms]
   ✓  Login limiter triggers 429 after repeated failures
   ✓  429 has a clear message and retry time
+  ✓  [Part 2 fix] retryAfterSeconds is the time left in the 900 s window (never more)
+  ✓  [Part 2 fix] Retry-After header matches the body
   ✓  Standard RateLimit headers present
   ✓  Limit reached within the configured window (<= 11 attempts)
 
+↳ Rate limit - retry time counts down [Part 2 feedback fix]
+  POST https://localhost:5000/api/auth/login [429 Too Many Requests, 1.32kB, 9ms]
+  ✓  Status code is 429
+  ✓  Remaining time went DOWN by about the 3 s we waited (not reset to the full window)
+  ✓  Retry-After header matches the body
+
 ↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [201 Created, 1.85kB, 18ms]
+  POST https://localhost:5000/api/bookings [201 Created, 1.98kB, 15ms]
   ✓  Booking 1 accepted before the limit
 
 Attempting to set next request to Rate limit - booking flood
 
 ↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [201 Created, 1.85kB, 11ms]
+  POST https://localhost:5000/api/bookings [201 Created, 1.98kB, 11ms]
   ✓  Booking 2 accepted before the limit
 
 Attempting to set next request to Rate limit - booking flood
 
 ↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [201 Created, 1.85kB, 17ms]
+  POST https://localhost:5000/api/bookings [201 Created, 1.98kB, 12ms]
   ✓  Booking 3 accepted before the limit
 
 Attempting to set next request to Rate limit - booking flood
 
 ↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [201 Created, 1.85kB, 15ms]
+  POST https://localhost:5000/api/bookings [201 Created, 1.98kB, 12ms]
   ✓  Booking 4 accepted before the limit
 
 Attempting to set next request to Rate limit - booking flood
 
 ↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [201 Created, 1.85kB, 23ms]
+  POST https://localhost:5000/api/bookings [201 Created, 1.98kB, 10ms]
   ✓  Booking 5 accepted before the limit
 
 Attempting to set next request to Rate limit - booking flood
 
 ↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [201 Created, 1.85kB, 15ms]
-  ✓  Booking 6 accepted before the limit
-
-Attempting to set next request to Rate limit - booking flood
-
-↳ Rate limit - booking flood
-  POST https://localhost:5000/api/bookings [429 Too Many Requests, 1.19kB, 5ms]
+  POST https://localhost:5000/api/bookings [429 Too Many Requests, 1.33kB, 8ms]
   ✓  Booking limiter triggers 429
   ✓  429 has a clear message and retry time
+  ✓  [Part 2 fix] booking retry time is within the 600 s window and matches Retry-After
 
 ↳ Unknown route - safe 404
-  GET https://localhost:5000/api/does-not-exist [404 Not Found, 1.11kB, 2ms]
+  GET https://localhost:5000/api/does-not-exist [404 Not Found, 1.3kB, 2ms]
   ✓  Status code is 404
   ✓  Error uses the safe envelope (success=false, message, nothing internal)
 
-┌─────────────────────────┬───────────────────┬──────────────────┐
-│                         │          executed │           failed │
-├─────────────────────────┼───────────────────┼──────────────────┤
-│              iterations │                 1 │                0 │
-├─────────────────────────┼───────────────────┼──────────────────┤
-│                requests │               103 │                0 │
-├─────────────────────────┼───────────────────┼──────────────────┤
-│            test-scripts │               103 │                0 │
-├─────────────────────────┼───────────────────┼──────────────────┤
-│      prerequest-scripts │                 3 │                0 │
-├─────────────────────────┼───────────────────┼──────────────────┤
-│              assertions │               235 │                0 │
-├─────────────────────────┴───────────────────┴──────────────────┤
-│ total run duration: 5.9s                                       │
-├────────────────────────────────────────────────────────────────┤
-│ total data received: 43.55kB (approx)                          │
-├────────────────────────────────────────────────────────────────┤
-│ average response time: 39ms [min: 2ms, max: 333ms, s.d.: 80ms] │
-└────────────────────────────────────────────────────────────────┘
+┌─────────────────────────┬───────────────────┬───────────────────┐
+│                         │          executed │            failed │
+├─────────────────────────┼───────────────────┼───────────────────┤
+│              iterations │                 1 │                 0 │
+├─────────────────────────┼───────────────────┼───────────────────┤
+│                requests │               152 │                 0 │
+├─────────────────────────┼───────────────────┼───────────────────┤
+│            test-scripts │               152 │                 0 │
+├─────────────────────────┼───────────────────┼───────────────────┤
+│      prerequest-scripts │                 4 │                 0 │
+├─────────────────────────┼───────────────────┼───────────────────┤
+│              assertions │               372 │                 0 │
+├─────────────────────────┴───────────────────┴───────────────────┤
+│ total run duration: 14.3s                                       │
+├─────────────────────────────────────────────────────────────────┤
+│ total data received: 99.61kB (approx)                           │
+├─────────────────────────────────────────────────────────────────┤
+│ average response time: 55ms [min: 2ms, max: 364ms, s.d.: 107ms] │
+└─────────────────────────────────────────────────────────────────┘
