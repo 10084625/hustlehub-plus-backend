@@ -19,13 +19,12 @@ const LINKS = {
     { to: '/gigs', label: 'All gigs' },
   ],
 };
-
 const ACCOUNT_LINK = { to: '/account', label: 'Account' };
 
 const ROLE_NAME = { client: 'Client', freelancer: 'Freelancer', admin: 'Admin' };
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
