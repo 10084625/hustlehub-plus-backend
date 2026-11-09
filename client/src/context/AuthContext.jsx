@@ -39,6 +39,8 @@ export function AuthProvider({ children }) {
   const [notice, setNotice] = useState('');
   const timer = useRef(null);
 
+  // Clears the session in the browser. Used directly when the token has
+  // already expired or the API answered 401 (nothing left to revoke).
   const logout = useCallback((message = '') => {
     sessionStorage.removeItem(STORAGE_KEY);
     setAuthToken(null);
@@ -68,13 +70,41 @@ export function AuthProvider({ children }) {
     setUnauthorisedHandler(() => logout('Please sign in again to continue.'));
   }, [logout]);
 
+  // Part 3: a real sign-out. The API puts this token on its deny-list first,
+  // so a copy of the token cannot be used afterwards. The browser session is
+  // cleared even if the network call fails.
+  const signOut = useCallback(async () => {
+    try {
+      await api.logout();
+    } catch {
+      /* already invalid or offline: clearing locally is still correct */
+    }
+    logout();
+  }, [logout]);
+
+  // Part 3: ends every session for this account on every device.
+  const signOutEverywhere = useCallback(async () => {
+    await api.logoutAll();
+    logout('You have been signed out on every device.');
+  }, [logout]);
+
   const login = useCallback(async (credentials) => startSession(await api.login(credentials)), [startSession]);
   const register = useCallback(async (details) => startSession(await api.register(details)), [startSession]);
   const clearNotice = useCallback(() => setNotice(''), []);
 
   const value = useMemo(
-    () => ({ user: session?.user ?? null, isAuthenticated: Boolean(session), login, register, logout, notice, clearNotice }),
-    [session, login, register, logout, notice, clearNotice]
+    () => ({
+      user: session?.user ?? null,
+      isAuthenticated: Boolean(session),
+      login,
+      register,
+      logout,
+      signOut,
+      signOutEverywhere,
+      notice,
+      clearNotice,
+    }),
+    [session, login, register, logout, signOut, signOutEverywhere, notice, clearNotice]
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
