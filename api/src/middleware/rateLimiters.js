@@ -21,3 +21,28 @@ const secondsUntilReset = (resetTime, windowMs, now = Date.now()) => {
   }
   return Math.max(1, Math.ceil(windowMs / 1000));
 };
+
+/**
+ * Builds a limiter that answers with the same JSON envelope as every other
+ * error, tells the caller how long to wait (the true remaining time, in both
+ * the body and the standard Retry-After header), sends the standard
+ * RateLimit-* headers (draft-7) and records the event in the security log.
+ */
+const buildLimiter = ({ name, max, windowMin, message, keyGenerator }) =>
+  rateLimit({
+    windowMs: windowMin * 60 * 1000,
+    limit: max,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    keyGenerator,
+    handler: (req, res, next, options) => {
+      const retryAfterSeconds = secondsUntilReset(req.rateLimit && req.rateLimit.resetTime, options.windowMs);
+      res.set('Retry-After', String(retryAfterSeconds));
+      logEvent('warn', 'ratelimit.exceeded', req, { limiter: name, limit: options.limit, retryAfterSeconds });
+      res.status(429).json({
+        success: false,
+        message,
+        retryAfterSeconds,
+      });
+    },
+  });
