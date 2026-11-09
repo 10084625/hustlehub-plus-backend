@@ -49,3 +49,31 @@ const getIncomeSummary = async (req, res, next) => {
       },
       { grossIncome: 0, platformFees: 0, netIncome: 0 }
     );
+
+    const byMonthMap = new Map();
+    transactions.forEach((t) => {
+      const month = new Date(t.createdAt).toISOString().slice(0, 7); // "2026-10"
+      const entry = byMonthMap.get(month) || { month, netIncome: 0, bookings: 0 };
+      entry.netIncome += t.freelancerEarnings;
+      entry.bookings += 1;
+      byMonthMap.set(month, entry);
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: 'Income summary retrieved successfully.',
+      data: {
+        currency: 'ZAR',
+        transactionCount: transactions.length,
+        grossIncome: round2(totals.grossIncome),
+        platformFees: round2(totals.platformFees),
+        netIncome: round2(totals.netIncome),
+        averagePerBooking: transactions.length ? round2(totals.netIncome / transactions.length) : 0,
+        byMonth: [...byMonthMap.values()].map((m) => ({ ...m, netIncome: round2(m.netIncome) })),
+        integrity,
+      },
+    });
+  } catch (err) {
+    return next(err);
+  }
+};
