@@ -1,4 +1,4 @@
-// References: [24] MDN Canvas API, [25] MDN prefers-reduced-motion.
+// References: [23] MDN Canvas API, [24] MDN prefers-reduced-motion.
 // README section 22 (References).
 import { useEffect, useRef } from 'react';
 
@@ -88,10 +88,9 @@ export default function ParticleBackground() {
       });
     // Faint connecting lines between nearby points
       const linkDist = 150;
-      for (let i = 0; i < projected.length; i += 1) {
-        const a = projected[i];
-        for (let j = i + 1; j < projected.length; j += 1) {
-          const b = projected[j];
+      // forEach/slice instead of numeric indexes (ESLint security finding fix)
+      projected.forEach((a, i) => {
+        projected.slice(i + 1).forEach((b) => {
           const dx = a.sx - b.sx;
           const dy = a.sy - b.sy;
           const dist = Math.sqrt(dx * dx + dy * dy);
@@ -104,8 +103,8 @@ export default function ParticleBackground() {
             ctx.lineTo(b.sx, b.sy);
             ctx.stroke();
           }
-        }
-      }
+        });
+      });
 
       // The points themselves: nearer ones are larger and brighter
       projected.forEach((p) => {
