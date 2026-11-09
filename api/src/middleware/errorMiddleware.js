@@ -38,3 +38,37 @@ const normaliseError = (err) => {
   }
   return err;
 };
+
+/**
+ * globalErrorHandler - the single exit point for every error. Clients only
+ * get a status code, a safe message and the request id; stack traces, file
+ * paths, query text and library errors stay in the server log.
+ *
+ * Part 3: unexpected errors are written to the error log and the audit
+ * trail (event "error.unhandled") together with the request id, so the
+ * request id a user quotes leads straight to the full details.
+ */
+const globalErrorHandler = (err, req, res, next) => {
+  const normalised = normaliseError(err);
+  const statusCode = normalised.statusCode || 500;
+  const isOperational = normalised.isOperational === true;
+
+  if (!isOperational || statusCode >= 500) {
+    logEvent('error', 'error.unhandled', req, { name: err.name, message: err.message, statusCode });
+    logger.debug('error.stack', { event: 'error.stack', requestId: req.id, stack: err.stack });
+  } else if (statusCode === 400) {
+    logger.info('request.rejected', { event: 'request.rejected', requestId: req.id, path: req.path, reason: normalised.message });
+  }
+
+  const body = {
+    success: false,
+    message: isOperational ? normalised.message : 'Something went wrong. Please try again later.',
+  };
+  if (isOperational && err.extra && typeof err.extra.retryAfterSeconds === 'number') {
+    body.retryAfterSeconds = err.extra.retryAfterSeconds;
+  }
+  if (req.id) body.requestId = req.id;
+  res.status(statusCode).json(body);
+};
+
+module.exports = { notFound, globalErrorHandler };
