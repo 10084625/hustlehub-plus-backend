@@ -18,3 +18,16 @@ export const CATEGORIES = [
   { value: 'other', label: 'Other' },
 ];
 export const categoryLabel = (v) => CATEGORIES.find((c) => c.value === v)?.label ?? v;
+
+
+const rand0 = new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR', maximumFractionDigits: 0 });
+const dateTime = new Intl.DateTimeFormat('en-ZA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+/** Whole rand, for chart axes and big headline numbers. */
+export const formatRandShort = (n) => rand0.format(Number(n) || 0);
+/** 0.1393 -> "13.9%" */
+export const formatPercent = (rate, digits = 1) => `${((Number(rate) || 0) * 100).toFixed(digits)}%`;
+export const formatDateTime = (iso) => (iso ? dateTime.format(new Date(iso)) : '');
+/** "2026-09" -> "Sep" */
+export const formatMonthShort = (yyyyMm) =>
+  new Intl.DateTimeFormat('en-ZA', { month: 'short' }).format(new Date(`${yyyyMm}-01T00:00:00`));

@@ -4,6 +4,119 @@ import Alert from '../components/Alert';
 import { Loading } from '../components/States';
 import { formatDate, formatRand } from '../utils/format';
 
+const LEVEL_FILTERS = [
+  { value: '', label: 'All events' },
+  { value: 'warn', label: 'Warnings' },
+  { value: 'error', label: 'Errors' },
+];
+
+
+/**
+ * Part 3: security monitoring for admins. Shows the audit trail (newest
+ * first, filterable) and runs the tamper-evident ledger check.
+ */
+function SecurityPanel({ security }) {
+  const [level, setLevel] = useState('');
+  const [logs, setLogs] = useState(null);
+  const [ledger, setLedger] = useState(null);
+  const [error, setError] = useState('');
+  const [checking, setChecking] = useState(false);
+
+  useEffect(() => {
+    setLogs(null);
+    api
+      .auditLogs(level ? { level, limit: 50 } : { limit: 50 })
+      .then((d) => setLogs(d.logs))
+      .catch((err) => setError(err.message));
+  }, [level]);
+
+  const check = async () => {
+    setChecking(true);
+    setError('');
+    try {
+      setLedger(await api.verifyLedger());
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setChecking(false);
+    }
+  };
+
+
+  return (
+    <section className="panel" aria-labelledby="security-heading">
+      <div className="panel-head">
+        <h2 id="security-heading">Security monitoring</h2>
+        <button type="button" className="btn btn-small" onClick={check} disabled={checking}>
+          {checking ? 'Checking…' : 'Check ledger integrity'}
+        </button>
+      </div>
+      <Alert>{error}</Alert>
+      {security && (
+        <p className="fine-print">
+          Last 24 hours: {security.failedLogins24h} failed sign-in{security.failedLogins24h === 1 ? '' : 's'},{' '}
+          {security.lockouts24h} account lockout{security.lockouts24h === 1 ? '' : 's'}.
+        </p>
+      )}
+      {ledger && (
+        <div className={`alert ${ledger.intact ? 'alert-success' : 'alert-error'}`} role="status">
+          {ledger.intact
+            ? `Ledger intact: ${ledger.valid} signed transaction${ledger.valid === 1 ? '' : 's'} verified`
+            : `${ledger.tampered.length} transaction${ledger.tampered.length === 1 ? ' has' : 's have'} been changed outside the app: ${ledger.tampered.map((t) => t.reference).join(', ')}`}
+          {ledger.unsigned > 0 ? ` (${ledger.unsigned} older unsigned record${ledger.unsigned === 1 ? '' : 's'})` : ''}.
+        </div>
+      )}
+
+      <div className="filter-row" role="group" aria-label="Filter audit log">
+        {LEVEL_FILTERS.map((f) => (
+          <button
+            key={f.value}
+            type="button"
+            className={`btn btn-small${level === f.value ? ' btn-primary' : ''}`}
+            aria-pressed={level === f.value}
+            onClick={() => setLevel(f.value)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {!logs ? (
+        <Loading label="Loading audit log" />
+      ) : (
+        <div className="table-wrap">
+          <table className="table">
+            <caption className="visually-hidden">Audit log</caption>
+            <thead>
+              <tr>
+                <th scope="col">When</th>
+                <th scope="col">Level</th>
+                <th scope="col">Event</th>
+                <th scope="col">User</th>
+                <th scope="col">IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {logs.map((l) => (
+                <tr key={l.id}>
+                  <td>{formatDateTime(l.createdAt)}</td>
+                  <td>
+                    <span className={`level level-${l.level}`}>{l.level}</span>
+                  </td>
+                  <td className="mono">{l.event}</td>
+                  <td>{l.user?.username ?? ''}</td>
+                  <td className="mono">{l.ip}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
+
 export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState(null);

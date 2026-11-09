@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { signTransaction } = require('../utils/ledger');
 
 // Simulated platform fee taken from each booking. The freelancer's income
 // for a booking is amount - platformFee.
@@ -21,15 +22,24 @@ const transactionSchema = new mongoose.Schema(
     currency: { type: String, default: 'ZAR' },
     paymentMethod: { type: String, default: 'simulated' },
     status: { type: String, enum: ['completed'], default: 'completed' },
+    // Part 3: HMAC-SHA256 over the money fields (see utils/ledger.js)
+    signature: { type: String },
   },
   { timestamps: true }
 );
+
+// Sign every new transaction, whichever code path creates it.
+transactionSchema.pre('save', function signOnCreate(next) {
+  if (this.isNew) this.signature = signTransaction(this);
+  next();
+});
 
 transactionSchema.set('toJSON', {
   versionKey: false,
   transform: (doc, ret) => {
     ret.id = ret._id.toString();
     delete ret._id;
+    delete ret.signature;
     return ret;
   },
 });

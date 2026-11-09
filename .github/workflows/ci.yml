@@ -1,0 +1,293 @@
+# HustleHub+ CI/CD pipeline (Part 3: DevSecOps)
+#
+# Runs on every push and pull request. Any failing test, lint rule, security
+# scan or container check fails the pipeline, so broken or insecure code
+# cannot be merged unnoticed.
+#
+#   1. backend          ESLint (security rules) + Jest unit tests with coverage
+#   2. frontend         ESLint (security, React, a11y) + Vitest tests + production build
+#   3. sast             Semgrep static analysis (OWASP Top 10, Node, Express, React, JWT, secrets)
+#   4. dependencies     npm audit of everything that ships (fails on high/critical)
+#   5. secrets          Gitleaks secret scan
+#   6. docker-stack     builds both images, runs the whole stack with Docker Compose,
+#                       runs the Newman API suite against the containers,
+#                       scans both images with Trivy, runs an OWASP ZAP baseline scan
+#                       and saves the container logs
+
+name: CI
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+# Least privilege: the pipeline can only read the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  backend:
+    name: Backend - lint and unit tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint (ESLint + eslint-plugin-security)
+        run: npm run lint
+      - name: Unit tests with coverage (Jest)
+        run: npm run test:coverage
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: api/coverage
+          retention-days: 14
+
+  frontend:
+    name: Frontend - lint, tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint (ESLint + security, React, hooks, a11y)
+        run: npm run lint
+      - name: Component tests (Vitest + React Testing Library)
+        run: npx vitest run --reporter=default --reporter=junit --outputFile.junit=vitest-results.xml
+      - name: Production build
+        run: npm run build
+      - name: Upload test results and build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-and-tests
+          path: |
+            client/vitest-results.xml
+            client/dist
+          retention-days: 14
+
+  sast:
+    name: Static analysis - Semgrep
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep:1.183.0
+    steps:
+      - uses: actions/checkout@v4
+      - name: Semgrep scan (fails on any warning or error finding)
+        run: |
+          semgrep scan --metrics=off \
+            --config p/javascript --config p/nodejs --config p/expressjs \
+            --config p/react --config p/jwt --config p/secrets --config p/owasp-top-ten \
+            --severity WARNING --severity ERROR \
+            --json --output semgrep-results.json --error \
+            api client
+      - name: Readable summary
+        if: always()
+        run: |
+          semgrep scan --metrics=off \
+            --config p/javascript --config p/nodejs --config p/expressjs \
+            --config p/react --config p/jwt --config p/secrets --config p/owasp-top-ten \
+            --severity WARNING --severity ERROR api client | tee semgrep-summary.txt
+      - name: Upload Semgrep results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: |
+            semgrep-results.json
+            semgrep-summary.txt
+          retention-days: 30
+
+  dependencies:
+    name: Dependency audit - npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Audit API production dependencies (fail on high or critical)
+        working-directory: api
+        run: npm audit --omit=dev --audit-level=high
+      - name: Audit frontend production dependencies (fail on high or critical)
+        working-directory: client
+        run: npm audit --omit=dev --audit-level=high
+      - name: Full audit reports, including test tools (for information)
+        if: always()
+        run: |
+          (cd api && npm audit --json > ../npm-audit-api.json || true)
+          (cd client && npm audit --json > ../npm-audit-client.json || true)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit-reports
+          path: npm-audit-*.json
+          retention-days: 30
+
+  secrets:
+    name: Secret scan - Gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan the current files (fails if a secret is found)
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 \
+            detect --source /repo --no-git --redact --verbose \
+            --report-format json --report-path /repo/gitleaks-report.json
+      - name: Scan the full commit history (report only)
+        continue-on-error: true
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 \
+            detect --source /repo --redact --report-format json --report-path /repo/gitleaks-history.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gitleaks-reports
+          path: gitleaks-*.json
+          retention-days: 30
+
+  docker-stack:
+    name: Docker - build, run stack, API tests, image and DAST scans
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: api/package-lock.json
+
+      - name: Create throwaway secrets for this run only
+        run: |
+          {
+            echo "JWT_SECRET=$(openssl rand -hex 48)"
+            echo "LEDGER_HMAC_SECRET=$(openssl rand -hex 48)"
+            echo "MONGO_ROOT_USERNAME=hustlehub"
+            echo "MONGO_ROOT_PASSWORD=$(openssl rand -hex 24)"
+            echo "ADMIN_USERNAME=platform_admin"
+            echo "ADMIN_EMAIL=admin@hustlehub.local"
+            echo "ADMIN_PASSWORD=Ci!$(openssl rand -hex 12)"
+            echo "LOG_LEVEL=http"
+          } > .env
+          echo "::add-mask::$(grep ADMIN_PASSWORD .env | cut -d= -f2)"
+
+      - name: Build both images
+        run: docker compose build
+
+      - name: Start the stack (certificate job, MongoDB, API, frontend)
+        run: docker compose up -d
+
+      - name: Wait until both containers are healthy
+        run: |
+          for i in $(seq 1 60); do
+            api=$(curl -sk -o /dev/null -w '%{http_code}' https://localhost:5000/api/health || true)
+            web=$(curl -sk -o /dev/null -w '%{http_code}' https://localhost:3000/ || true)
+            echo "attempt $i: api=$api web=$web"
+            if [ "$api" = "200" ] && [ "$web" = "200" ]; then exit 0; fi
+            sleep 3
+          done
+          docker compose ps
+          docker compose logs
+          exit 1
+
+      - name: Smoke test the frontend container (headers, CSP, proxy)
+        run: |
+          headers=$(curl -sk -D - -o /dev/null https://localhost:3000/dashboard)
+          echo "$headers"
+          echo "$headers" | grep -qi "content-security-policy: default-src 'self'"
+          echo "$headers" | grep -qi "strict-transport-security"
+          echo "$headers" | grep -qi "x-frame-options: DENY"
+          curl -skf https://localhost:3000/api/health
+          docker compose ps
+
+      - name: Install Newman
+        working-directory: api
+        run: npm ci
+
+      - name: API tests against the running containers (Newman)
+        working-directory: api
+        run: |
+          ADMIN_PASSWORD=$(grep ADMIN_PASSWORD ../.env | cut -d= -f2)
+          npx newman run ../postman/HustleHub-Part3.postman_collection.json \
+            -e ../postman/HustleHub-local.postman_environment.json \
+            --env-var "adminPassword=$ADMIN_PASSWORD" \
+            --insecure \
+            --reporters cli,htmlextra,junit \
+            --reporter-htmlextra-export ../newman-docker-report.html \
+            --reporter-junit-export ../newman-docker-results.xml
+
+      - name: Container image scan - API (Trivy, fails on fixable high/critical)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/out" aquasec/trivy:0.58.1 \
+            image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            --format table --output /out/trivy-api.txt hustlehub-api:latest
+          cat trivy-api.txt
+
+      - name: Container image scan - frontend (Trivy, fails on fixable high/critical)
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v "$PWD:/out" aquasec/trivy:0.58.1 \
+            image --severity HIGH,CRITICAL --ignore-unfixed --exit-code 1 \
+            --format table --output /out/trivy-client.txt hustlehub-client:latest
+          cat trivy-client.txt
+
+      - name: Dynamic scan of the running app (OWASP ZAP baseline, report only)
+        continue-on-error: true
+        run: |
+          mkdir -p zap && chmod 777 zap
+          docker run --rm --network host -v "$PWD/zap:/zap/wrk:rw" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t https://localhost:3000 -I -r zap-report.html -J zap-report.json
+
+      - name: Collect container logs (logging evidence)
+        if: always()
+        run: |
+          docker compose logs --no-color api > api-container.log || true
+          docker compose logs --no-color client > client-container.log || true
+          docker compose exec -T api cat /app/logs/app.log > api-app-log.jsonl 2>/dev/null || true
+
+      - name: Upload reports and logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-stack-evidence
+          path: |
+            newman-docker-report.html
+            newman-docker-results.xml
+            trivy-*.txt
+            zap/
+            *-container.log
+            api-app-log.jsonl
+          retention-days: 30
+
+      - name: Stop the stack
+        if: always()
+        run: docker compose down -v
