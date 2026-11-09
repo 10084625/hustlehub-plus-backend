@@ -2,14 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { api } from '../api/client';
 import Alert from '../components/Alert';
 import { Loading } from '../components/States';
-import { formatDate, formatRand } from '../utils/format';
+import { formatDate, formatDateTime, formatRand } from '../utils/format';
 
 const LEVEL_FILTERS = [
   { value: '', label: 'All events' },
   { value: 'warn', label: 'Warnings' },
   { value: 'error', label: 'Errors' },
 ];
-
 
 /**
  * Part 3: security monitoring for admins. Shows the audit trail (newest
@@ -41,7 +40,6 @@ function SecurityPanel({ security }) {
       setChecking(false);
     }
   };
-
 
   return (
     <section className="panel" aria-labelledby="security-heading">
@@ -116,7 +114,6 @@ function SecurityPanel({ security }) {
   );
 }
 
-
 export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState(null);
@@ -168,6 +165,8 @@ export default function AdminPage() {
           <div><dt>Platform fees</dt><dd className="mono-num">{formatRand(stats.platformRevenue)}</dd></div>
         </dl>
       )}
+
+      <SecurityPanel security={stats?.security} />
 
       {users && (
         <section className="panel" aria-labelledby="users-heading">
