@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true, select: false },
     role: { type: String, enum: ROLES, default: 'client' },
     isActive: { type: Boolean, default: true },
+    // Part 3: every token carries this number. Increasing it ("sign out
+    // everywhere", or an admin suspension) makes all older tokens invalid.
+    tokenVersion: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true }
 );
@@ -26,6 +29,7 @@ userSchema.set('toJSON', {
     ret.id = ret._id.toString();
     delete ret._id;
     delete ret.password;
+    delete ret.tokenVersion;
     return ret;
   },
 });
