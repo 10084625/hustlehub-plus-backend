@@ -17,7 +17,7 @@ export const signInAs = (role, username = `${role}_user`) => {
 export const mockFetch = (routes) => {
   const fn = vi.fn(async (url, init = {}) => {
     const key = `${init.method || 'GET'} ${url.replace(/^\/api/, '').split('?')[0]}`;
-    const [status, body] = routes[key] ?? [404, { success: false, message: 'not mocked' }];
+    const [status, body] = new Map(Object.entries(routes)).get(key) ?? [404, { success: false, message: 'not mocked' }];
     return { ok: status >= 200 && status < 300, status, json: async () => body };
   });
   vi.stubGlobal('fetch', fn);
