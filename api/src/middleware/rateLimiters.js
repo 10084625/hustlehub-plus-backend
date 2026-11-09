@@ -46,3 +46,44 @@ const buildLimiter = ({ name, max, windowMin, message, keyGenerator }) =>
       });
     },
   });
+
+  // Login and registration: stops password guessing and mass account creation.
+// Keyed by IP + the email being tried, so one attacker cannot lock out
+// everyone behind the same network, and one email cannot be hammered.
+const authLimiter = buildLimiter({
+  name: 'auth',
+  ...config.rateLimit.auth,
+  message: 'Too many sign-in attempts. Please wait before trying again.',
+  keyGenerator: (req) => {
+    const email = typeof req.body?.email === 'string' ? req.body.email.toLowerCase().trim() : '';
+    return `${req.ip}|${email}`;
+  },
+});
+
+// Second layer on auth routes: a per-IP ceiling, so an attacker cannot get
+// around the per-email limit by spraying many different email addresses.
+const authIpLimiter = buildLimiter({
+  name: 'auth-ip',
+  max: config.rateLimit.auth.max * 10,
+  windowMin: config.rateLimit.auth.windowMin,
+  message: 'Too many sign-in attempts from this network. Please wait before trying again.',
+});
+
+// Booking creation: stops a single account from flooding freelancers with
+// fake bookings and the ledger with junk transactions. Keyed by user id
+// (protect runs first), falling back to IP.
+const bookingLimiter = buildLimiter({
+  name: 'booking',
+  ...config.rateLimit.booking,
+  message: 'Too many bookings in a short time. Please wait before booking again.',
+  keyGenerator: (req) => (req.user ? `user:${req.user.id}` : req.ip),
+});
+
+// A generous ceiling for the whole API to blunt scraping and basic DoS.
+const globalLimiter = buildLimiter({
+  name: 'global',
+  ...config.rateLimit.global,
+  message: 'Too many requests. Please slow down and try again shortly.',
+});
+
+module.exports = { authLimiter, authIpLimiter, bookingLimiter, globalLimiter, secondsUntilReset, buildLimiter };
