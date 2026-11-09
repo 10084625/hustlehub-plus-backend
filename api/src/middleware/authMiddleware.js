@@ -1,10 +1,13 @@
 // References: [3] RFC 7519 JWT, [12] jsonwebtoken (token verification),
-// [19] OWASP Authorization Cheat Sheet (deny by default, role checks).
-// README section 16.
+// [20] OWASP Authorization Cheat Sheet (deny by default, role checks),
+// [21] OWASP Session Management Cheat Sheet (server-side logout).
+// README section 22 (References).
 const mongoose = require('mongoose');
 const AppError = require('../utils/AppError');
 const { verifyToken } = require('../utils/generateToken');
 const { User } = require('../models/User');
+const { RevokedToken } = require('../models/RevokedToken');
+const { logEvent } = require('../utils/audit');
 
 const NOT_AUTHORISED = 'Not authorised. Please log in to access this resource.';
 
@@ -16,7 +19,11 @@ const NOT_AUTHORISED = 'Not authorised. Please log in to access this resource.';
  *   3. Loads the user from the database so that a deleted or deactivated
  *      account loses access immediately, and so the role used for RBAC comes
  *      from the database rather than only from the token.
- *   4. Attaches a minimal user object to req.user.
+ *   4. Part 3: refuses tokens that were signed out (jti on the deny-list) or
+ *      that are older than the user's current tokenVersion ("sign out
+ *      everywhere" or an admin suspension).
+ *   5. Attaches a minimal user object to req.user, and the token's id and
+ *      expiry to req.auth (used by logout).
  */
 const protect = async (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -27,41 +34,57 @@ const protect = async (req, res, next) => {
   const token = authHeader.slice('Bearer '.length).trim();
   if (!token) return next(new AppError(NOT_AUTHORISED, 401));
 
+  const reject = (reason, message = NOT_AUTHORISED, userId = undefined) => {
+    logEvent('warn', 'auth.token.rejected', req, { reason }, { userId });
+    return next(new AppError(message, 401));
+  };
+
   let decoded;
   try {
     decoded = verifyToken(token);
   } catch (err) {
-    const message =
-      err.name === 'TokenExpiredError' ? 'Your session has expired. Please log in again.' : NOT_AUTHORISED;
-    return next(new AppError(message, 401));
+    if (err.name === 'TokenExpiredError') {
+      return reject('expired', 'Your session has expired. Please log in again.');
+    }
+    return reject('invalid');
   }
 
   try {
-    if (!mongoose.isValidObjectId(decoded.sub)) return next(new AppError(NOT_AUTHORISED, 401));
-    const user = await User.findById(decoded.sub);
-    if (!user || !user.isActive) return next(new AppError(NOT_AUTHORISED, 401));
+    if (!mongoose.isValidObjectId(decoded.sub) || typeof decoded.jti !== 'string') return reject('malformed_claims');
+
+    const [user, revoked] = await Promise.all([User.findById(decoded.sub), RevokedToken.exists({ jti: decoded.jti })]);
+    if (!user) return reject('user_missing');
+    if (!user.isActive) return reject('account_suspended', NOT_AUTHORISED, user.id);
+    if (revoked) return reject('signed_out', 'You have signed out. Please log in again.', user.id);
+    if ((decoded.tv || 0) !== (user.tokenVersion || 0)) {
+      return reject('token_version', 'Your session was ended. Please log in again.', user.id);
+    }
 
     req.user = { id: user._id.toString(), role: user.role, email: user.email, username: user.username };
+    req.auth = { jti: decoded.jti, expiresAt: new Date(decoded.exp * 1000) };
     return next();
   } catch (err) {
     return next(err);
   }
 };
+
 /**
  * authorize - role-based access control. Use after protect.
  *   router.post('/', protect, authorize('freelancer'), handler)
  * A logged-in user with the wrong role gets 403 Forbidden (they are known,
  * just not allowed), which is different from 401 (not logged in).
+ * Every refusal is written to the security log, because repeated 403s from
+ * one account are a sign of someone probing for access.
  */
 const authorize =
   (...allowedRoles) =>
   (req, res, next) => {
     if (!req.user) return next(new AppError(NOT_AUTHORISED, 401));
     if (!allowedRoles.includes(req.user.role)) {
+      logEvent('warn', 'authz.denied', req, { required: allowedRoles });
       return next(new AppError('You do not have permission to perform this action.', 403));
     }
     return next();
   };
 
 module.exports = { protect, authorize };
-

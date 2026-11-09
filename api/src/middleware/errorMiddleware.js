@@ -1,4 +1,5 @@
-const config = require('../config/env');
+const logger = require('../utils/logger');
+const { logEvent } = require('../utils/audit');
 
 /**
  * notFound - turns unknown routes into a clean JSON 404.
@@ -40,28 +41,34 @@ const normaliseError = (err) => {
 
 /**
  * globalErrorHandler - the single exit point for every error. Clients only
- * get a status code and a safe message; stack traces, file paths, query
- * text and library errors stay in the server log.
+ * get a status code, a safe message and the request id; stack traces, file
+ * paths, query text and library errors stay in the server log.
+ *
+ * Part 3: unexpected errors are written to the error log and the audit
+ * trail (event "error.unhandled") together with the request id, so the
+ * request id a user quotes leads straight to the full details.
  */
-// eslint-disable-next-line no-unused-vars
 const globalErrorHandler = (err, req, res, next) => {
   const normalised = normaliseError(err);
   const statusCode = normalised.statusCode || 500;
   const isOperational = normalised.isOperational === true;
 
-  if (config.nodeEnv !== 'test') {
-    // eslint-disable-next-line no-console
-    console.error(`[ERROR] ${req.method} ${req.path} -> ${statusCode}: ${err.message}`);
-    if (config.nodeEnv === 'development' && !isOperational) {
-      // eslint-disable-next-line no-console
-      console.error(err.stack);
-    }
+  if (!isOperational || statusCode >= 500) {
+    logEvent('error', 'error.unhandled', req, { name: err.name, message: err.message, statusCode });
+    logger.debug('error.stack', { event: 'error.stack', requestId: req.id, stack: err.stack });
+  } else if (statusCode === 400) {
+    logger.info('request.rejected', { event: 'request.rejected', requestId: req.id, path: req.path, reason: normalised.message });
   }
 
-  res.status(statusCode).json({
+  const body = {
     success: false,
     message: isOperational ? normalised.message : 'Something went wrong. Please try again later.',
-  });
+  };
+  if (isOperational && err.extra && typeof err.extra.retryAfterSeconds === 'number') {
+    body.retryAfterSeconds = err.extra.retryAfterSeconds;
+  }
+  if (req.id) body.requestId = req.id;
+  res.status(statusCode).json(body);
 };
 
 module.exports = { notFound, globalErrorHandler };
