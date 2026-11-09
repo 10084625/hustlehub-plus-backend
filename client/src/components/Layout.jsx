@@ -20,14 +20,16 @@ const LINKS = {
   ],
 };
 
+const ACCOUNT_LINK = { to: '/account', label: 'Account' };
+
 const ROLE_NAME = { client: 'Client', freelancer: 'Freelancer', admin: 'Admin' };
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const signOut = () => {
-    logout();
+  const handleSignOut = async () => {
+    await signOut();
     navigate('/login', { replace: true });
   };
 
@@ -45,7 +47,7 @@ export default function Layout() {
         {user && (
           <nav aria-label="Main">
             <ul className="nav-links">
-              {LINKS[user.role]?.map((l) => (
+              {[...(LINKS[user.role] ?? []), ACCOUNT_LINK].map((l) => (
                 <li key={l.to}>
                   <NavLink to={l.to}>{l.label}</NavLink>
                 </li>
@@ -58,7 +60,7 @@ export default function Layout() {
             <span>
               {user.username} <span className="role-badge">{ROLE_NAME[user.role]}</span>
             </span>
-            <button type="button" className="btn btn-quiet" onClick={signOut}>
+            <button type="button" className="btn btn-quiet" onClick={handleSignOut}>
               Sign out
             </button>
           </div>
