@@ -1,3 +1,5 @@
+// References: [24] MDN Canvas API, [25] MDN prefers-reduced-motion.
+// README section 16.
 import { useEffect, useRef } from 'react';
 
 /**

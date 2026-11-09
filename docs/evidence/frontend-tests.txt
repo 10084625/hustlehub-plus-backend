@@ -1,0 +1,41 @@
+
+> hustlehub-plus-client@2.0.0 test:report
+> vitest run --reporter=verbose --reporter=junit --outputFile.junit=../docs/evidence/frontend-test-results.xml
+
+
+ RUN  v2.1.9 /home/claude/work/repo/client
+
+ ✓ src/test/Gigs.test.jsx > GigCard > renders title, price, category and freelancer
+ ✓ src/test/Gigs.test.jsx > GigCard > shows malicious text as plain text instead of running it (XSS)
+ ✓ src/test/Gigs.test.jsx > PriceTag > formats rand values with two decimals
+ ✓ src/test/Gigs.test.jsx > GigForm > blocks submission and explains every invalid field
+ ✓ src/test/Gigs.test.jsx > GigForm > submits clean, typed values 452ms
+ ✓ src/test/Gigs.test.jsx > GigForm > shows the API error if saving fails 348ms
+ ✓ src/test/LoginPage.test.jsx > LoginPage > renders the sign-in form
+ ✓ src/test/LoginPage.test.jsx > LoginPage > shows validation errors and does not call the API when fields are empty
+ ✓ src/test/LoginPage.test.jsx > LoginPage > rejects a malformed email before sending anything
+ ✓ src/test/LoginPage.test.jsx > LoginPage > shows the API message on failed login and clears the password
+ ✓ src/test/LoginPage.test.jsx > LoginPage > never shows raw server errors to the user
+ ✓ src/test/LoginPage.test.jsx > LoginPage > a freelancer is sent to the dashboard after signing in
+ ✓ src/test/Booking.test.jsx > Booking a gig > a client books a gig and sees the receipt with the transaction reference
+ ✓ src/test/Booking.test.jsx > Booking a gig > a freelancer sees the gig but cannot book it
+ ✓ src/test/Booking.test.jsx > Booking a gig > a rate-limited booking shows the friendly 429 message
+ ✓ src/test/Booking.test.jsx > Booking a gig > an invalid gig id in the URL never reaches the API
+ ✓ src/test/RegisterPage.test.jsx > RegisterPage > offers only client and freelancer roles (never admin)
+ ✓ src/test/RegisterPage.test.jsx > RegisterPage > flags a weak password and mismatched confirmation 343ms
+ ✓ src/test/RegisterPage.test.jsx > RegisterPage > rejects a username with HTML or symbols
+ ✓ src/test/RegisterPage.test.jsx > RegisterPage > sends exactly the documented fields with the chosen role 302ms
+ ✓ src/test/RegisterPage.test.jsx > RegisterPage > shows a duplicate-account message from the API
+ ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > signed-out visitors are sent to login
+ ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > an expired session counts as signed out
+ ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > a client cannot open an admin-only page
+ ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > the right role gets in
+ ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > navigation shows freelancer links only to freelancers
+ ✓ src/test/ProtectedRoute.test.jsx > ProtectedRoute and role-based navigation > signing out clears the stored session
+
+ Test Files  5 passed (5)
+      Tests  27 passed (27)
+   Start at  06:28:44
+   Duration  8.67s (transform 440ms, setup 919ms, collect 860ms, tests 3.66s, environment 2.06s, prepare 376ms)
+
+JUNIT report written to /home/claude/work/repo/docs/evidence/frontend-test-results.xml

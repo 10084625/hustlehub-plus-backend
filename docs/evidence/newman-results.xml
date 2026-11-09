@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="HustleHub+ API - Part 2 (Secure Stack)" tests="103" time="27.622">
+  <testsuite name="0. Setup (unique users per run) / Health check" id="1c505e1e-a466-4d88-bbbe-6485476421f7" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.181">
+    <testcase name="Status code is 200" time="0.181" classname="0SetupUniqueUsersPerRunHealthCheck"/>
+    <testcase name="API running" time="0.181" classname="0SetupUniqueUsersPerRunHealthCheck"/>
+  </testsuite>
+  <testsuite name="0. Setup (unique users per run) / Register freelancer" id="a8376a2f-c73a-455f-9127-f0ec93bd5285" timestamp="2026-10-11T17:29:28.121Z" tests="4" failures="0" errors="0" time="0.918">
+    <testcase name="Status code is 201" time="0.918" classname="0SetupUniqueUsersPerRunRegisterFreelancer"/>
+    <testcase name="Success envelope" time="0.918" classname="0SetupUniqueUsersPerRunRegisterFreelancer"/>
+    <testcase name="Password hash never returned" time="0.918" classname="0SetupUniqueUsersPerRunRegisterFreelancer"/>
+    <testcase name="Role is freelancer and token returned" time="0.918" classname="0SetupUniqueUsersPerRunRegisterFreelancer"/>
+  </testsuite>
+  <testsuite name="0. Setup (unique users per run) / Register second freelancer (used for ownership tests)" id="0ff9e8d2-4067-4e22-9f7a-6d7bfbe49ce6" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.949">
+    <testcase name="Status code is 201" time="0.949" classname="0SetupUniqueUsersPerRunRegisterSecondFreelancerUsedForOwnershipTests"/>
+    <testcase name="Success envelope" time="0.949" classname="0SetupUniqueUsersPerRunRegisterSecondFreelancerUsedForOwnershipTests"/>
+  </testsuite>
+  <testsuite name="0. Setup (unique users per run) / Register client (role omitted defaults to client)" id="b4e6d773-8023-40d2-9134-d388f8a893ce" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="1.165">
+    <testcase name="Status code is 201" time="1.165" classname="0SetupUniqueUsersPerRunRegisterClientRoleOmittedDefaultsToClient"/>
+    <testcase name="Success envelope" time="1.165" classname="0SetupUniqueUsersPerRunRegisterClientRoleOmittedDefaultsToClient"/>
+    <testcase name="Defaults to client role" time="1.165" classname="0SetupUniqueUsersPerRunRegisterClientRoleOmittedDefaultsToClient"/>
+  </testsuite>
+  <testsuite name="0. Setup (unique users per run) / Login client" id="e799e929-b02f-43f8-a48b-e5117d99e5cc" timestamp="2026-10-11T17:29:28.121Z" tests="4" failures="0" errors="0" time="0.779">
+    <testcase name="Status code is 200" time="0.779" classname="0SetupUniqueUsersPerRunLoginClient"/>
+    <testcase name="Success envelope" time="0.779" classname="0SetupUniqueUsersPerRunLoginClient"/>
+    <testcase name="Password hash never returned" time="0.779" classname="0SetupUniqueUsersPerRunLoginClient"/>
+    <testcase name="JWT has three parts and carries sub/role/iss/aud" time="0.779" classname="0SetupUniqueUsersPerRunLoginClient"/>
+  </testsuite>
+  <testsuite name="0. Setup (unique users per run) / Login admin (seeded account)" id="8108d70f-f9e7-47c2-8541-eecc5594b147" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.827">
+    <testcase name="Status code is 200" time="0.827" classname="0SetupUniqueUsersPerRunLoginAdminSeededAccount"/>
+    <testcase name="Success envelope" time="0.827" classname="0SetupUniqueUsersPerRunLoginAdminSeededAccount"/>
+    <testcase name="Role is admin" time="0.827" classname="0SetupUniqueUsersPerRunLoginAdminSeededAccount"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Register - duplicate email (409)" id="160a2242-ca7f-40cd-97c8-0642b69e58dd" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.116">
+    <testcase name="Status code is 409" time="0.116" classname="1AuthenticationInvalidScenariosRegisterDuplicateEmail409"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.116" classname="1AuthenticationInvalidScenariosRegisterDuplicateEmail409"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Register - missing fields (400)" id="33440cc9-ebde-4c4c-9d85-08ecabeb9eb6" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Status code is 400" time="0.011" classname="1AuthenticationInvalidScenariosRegisterMissingFields400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.011" classname="1AuthenticationInvalidScenariosRegisterMissingFields400"/>
+    <testcase name="Message explains the problem" time="0.011" classname="1AuthenticationInvalidScenariosRegisterMissingFields400"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Register - weak password (400)" id="19356175-afd7-4e1c-854d-23d1fb0f5378" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.013">
+    <testcase name="Status code is 400" time="0.013" classname="1AuthenticationInvalidScenariosRegisterWeakPassword400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.013" classname="1AuthenticationInvalidScenariosRegisterWeakPassword400"/>
+    <testcase name="Message explains the problem" time="0.013" classname="1AuthenticationInvalidScenariosRegisterWeakPassword400"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Register - self-assign admin role (400)" id="b5fd5fec-72e3-4191-822e-6d609f1ea4ae" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Status code is 400" time="0.011" classname="1AuthenticationInvalidScenariosRegisterSelfAssignAdminRole400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.011" classname="1AuthenticationInvalidScenariosRegisterSelfAssignAdminRole400"/>
+    <testcase name="Message explains the problem" time="0.011" classname="1AuthenticationInvalidScenariosRegisterSelfAssignAdminRole400"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Register - unexpected field rejected (400) [Part 1 fix]" id="5677ae03-62c9-44d3-acf8-63a44cfde97e" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="Status code is 400" time="0.009" classname="1AuthenticationInvalidScenariosRegisterUnexpectedFieldRejected400Part1Fix"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.009" classname="1AuthenticationInvalidScenariosRegisterUnexpectedFieldRejected400Part1Fix"/>
+    <testcase name="Message explains the problem" time="0.009" classname="1AuthenticationInvalidScenariosRegisterUnexpectedFieldRejected400Part1Fix"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Register - script in username (400)" id="3c210922-9764-4945-a5e7-5f6ba83da375" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.038">
+    <testcase name="Status code is 400" time="0.038" classname="1AuthenticationInvalidScenariosRegisterScriptInUsername400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.038" classname="1AuthenticationInvalidScenariosRegisterScriptInUsername400"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Login - unexpected field rejected (400) [Part 1 fix]" id="c74635f9-eff1-4625-adcb-8252864d57ff" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.008">
+    <testcase name="Status code is 400" time="0.008" classname="1AuthenticationInvalidScenariosLoginUnexpectedFieldRejected400Part1Fix"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.008" classname="1AuthenticationInvalidScenariosLoginUnexpectedFieldRejected400Part1Fix"/>
+    <testcase name="Message explains the problem" time="0.008" classname="1AuthenticationInvalidScenariosLoginUnexpectedFieldRejected400Part1Fix"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Login - NoSQL operator injection (400)" id="74f3cafb-3bd2-4098-a148-eebcec03b473" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.009">
+    <testcase name="Status code is 400" time="0.009" classname="1AuthenticationInvalidScenariosLoginNoSqlOperatorInjection400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.009" classname="1AuthenticationInvalidScenariosLoginNoSqlOperatorInjection400"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Login - wrong password (401, generic message)" id="38ca94f9-f614-4b0c-983e-8ba3f1435bc1" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="1.105">
+    <testcase name="Status code is 401" time="1.105" classname="1AuthenticationInvalidScenariosLoginWrongPassword401GenericMessage"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="1.105" classname="1AuthenticationInvalidScenariosLoginWrongPassword401GenericMessage"/>
+    <testcase name="Message explains the problem" time="1.105" classname="1AuthenticationInvalidScenariosLoginWrongPassword401GenericMessage"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Login - unknown email (401, same message)" id="0b642375-8d8b-4833-a333-5642297d5e51" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.299">
+    <testcase name="Status code is 401" time="0.299" classname="1AuthenticationInvalidScenariosLoginUnknownEmail401SameMessage"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.299" classname="1AuthenticationInvalidScenariosLoginUnknownEmail401SameMessage"/>
+    <testcase name="Message explains the problem" time="0.299" classname="1AuthenticationInvalidScenariosLoginUnknownEmail401SameMessage"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Login - malformed JSON (400)" id="fa5ef5e8-71d2-4ea5-81a6-ca3d7e922294" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Status code is 400" time="0.011" classname="1AuthenticationInvalidScenariosLoginMalformedJson400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.011" classname="1AuthenticationInvalidScenariosLoginMalformedJson400"/>
+    <testcase name="Message explains the problem" time="0.011" classname="1AuthenticationInvalidScenariosLoginMalformedJson400"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Profile - valid token (200)" id="daa198c4-cf43-4f3d-973b-72a020da178e" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.301">
+    <testcase name="Status code is 200" time="0.301" classname="1AuthenticationInvalidScenariosProfileValidToken200"/>
+    <testcase name="Success envelope" time="0.301" classname="1AuthenticationInvalidScenariosProfileValidToken200"/>
+    <testcase name="Password hash never returned" time="0.301" classname="1AuthenticationInvalidScenariosProfileValidToken200"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Profile - no token (401)" id="9a572ad6-5eef-49f1-a2c4-07463706da58" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.003">
+    <testcase name="Status code is 401" time="0.003" classname="1AuthenticationInvalidScenariosProfileNoToken401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.003" classname="1AuthenticationInvalidScenariosProfileNoToken401"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Profile - tampered token (401)" id="fa3c27c6-9f48-4467-afd3-96a7e24ab8de" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.019">
+    <testcase name="Status code is 401" time="0.019" classname="1AuthenticationInvalidScenariosProfileTamperedToken401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.019" classname="1AuthenticationInvalidScenariosProfileTamperedToken401"/>
+  </testsuite>
+  <testsuite name="1. Authentication - invalid scenarios / Profile - unsigned alg:none token (401) [Part 1 fix]" id="7be24c66-314c-4c20-9df2-098788694fca" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.014">
+    <testcase name="Status code is 401" time="0.014" classname="1AuthenticationInvalidScenariosProfileUnsignedAlgNoneToken401Part1Fix"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.014" classname="1AuthenticationInvalidScenariosProfileUnsignedAlgNoneToken401Part1Fix"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - freelancer (201)" id="5200e755-72d2-473b-ab71-cee78c90543a" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.283">
+    <testcase name="Status code is 201" time="0.283" classname="2GigsCrudOwnershipAndValidationCreateGigFreelancer201"/>
+    <testcase name="Success envelope" time="0.283" classname="2GigsCrudOwnershipAndValidationCreateGigFreelancer201"/>
+    <testcase name="Owner is the logged-in freelancer" time="0.283" classname="2GigsCrudOwnershipAndValidationCreateGigFreelancer201"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - HTML/script is stripped (201)" id="fa265b6b-6c86-4289-9263-61f83ac9e345" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.603">
+    <testcase name="Status code is 201" time="0.603" classname="2GigsCrudOwnershipAndValidationCreateGigHtmlScriptIsStripped201"/>
+    <testcase name="Success envelope" time="0.603" classname="2GigsCrudOwnershipAndValidationCreateGigHtmlScriptIsStripped201"/>
+    <testcase name="No HTML stored" time="0.603" classname="2GigsCrudOwnershipAndValidationCreateGigHtmlScriptIsStripped201"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - client role forbidden (403)" id="9a2caa3b-a200-435d-8cb9-21e11298b5fc" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.163">
+    <testcase name="Status code is 403" time="0.163" classname="2GigsCrudOwnershipAndValidationCreateGigClientRoleForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.163" classname="2GigsCrudOwnershipAndValidationCreateGigClientRoleForbidden403"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - no token (401)" id="31d5e764-5a61-4fc6-80f7-5e6462c2ba2e" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.006">
+    <testcase name="Status code is 401" time="0.006" classname="2GigsCrudOwnershipAndValidationCreateGigNoToken401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.006" classname="2GigsCrudOwnershipAndValidationCreateGigNoToken401"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - invalid values (400)" id="da83a799-85a7-49b5-86f4-04866cc4b344" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.151">
+    <testcase name="Status code is 400" time="0.151" classname="2GigsCrudOwnershipAndValidationCreateGigInvalidValues400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.151" classname="2GigsCrudOwnershipAndValidationCreateGigInvalidValues400"/>
+    <testcase name="Message explains the problem" time="0.151" classname="2GigsCrudOwnershipAndValidationCreateGigInvalidValues400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - price with 3 decimals (400)" id="d18b1b1e-df5e-4e19-a46f-4fd2fa3d0eb7" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.147">
+    <testcase name="Status code is 400" time="0.147" classname="2GigsCrudOwnershipAndValidationCreateGigPriceWith3Decimals400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.147" classname="2GigsCrudOwnershipAndValidationCreateGigPriceWith3Decimals400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Create gig - cannot set owner (400)" id="c0412c70-4434-42a3-aa0e-ff9d443e19d5" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.147">
+    <testcase name="Status code is 400" time="0.147" classname="2GigsCrudOwnershipAndValidationCreateGigCannotSetOwner400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.147" classname="2GigsCrudOwnershipAndValidationCreateGigCannotSetOwner400"/>
+    <testcase name="Message explains the problem" time="0.147" classname="2GigsCrudOwnershipAndValidationCreateGigCannotSetOwner400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Browse gigs - client (200)" id="52e15813-2e7f-4f4a-9a20-375388956af6" timestamp="2026-10-11T17:29:28.121Z" tests="5" failures="0" errors="0" time="0.352">
+    <testcase name="Status code is 200" time="0.352" classname="2GigsCrudOwnershipAndValidationBrowseGigsClient200"/>
+    <testcase name="Success envelope" time="0.352" classname="2GigsCrudOwnershipAndValidationBrowseGigsClient200"/>
+    <testcase name="Returns gigs with pagination" time="0.352" classname="2GigsCrudOwnershipAndValidationBrowseGigsClient200"/>
+    <testcase name="Only active gigs listed" time="0.352" classname="2GigsCrudOwnershipAndValidationBrowseGigsClient200"/>
+    <testcase name="Freelancer email not exposed" time="0.352" classname="2GigsCrudOwnershipAndValidationBrowseGigsClient200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Browse gigs - search + category filter (200)" id="51ba2618-2289-48c4-9223-b3ccd814ee80" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.316">
+    <testcase name="Status code is 200" time="0.316" classname="2GigsCrudOwnershipAndValidationBrowseGigsSearchCategoryFilter200"/>
+    <testcase name="Success envelope" time="0.316" classname="2GigsCrudOwnershipAndValidationBrowseGigsSearchCategoryFilter200"/>
+    <testcase name="Filter applied" time="0.316" classname="2GigsCrudOwnershipAndValidationBrowseGigsSearchCategoryFilter200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Browse gigs - unknown query param (400)" id="8100bf1c-2ec9-44ce-809a-2c2d8d797949" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.085">
+    <testcase name="Status code is 400" time="0.085" classname="2GigsCrudOwnershipAndValidationBrowseGigsUnknownQueryParam400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.085" classname="2GigsCrudOwnershipAndValidationBrowseGigsUnknownQueryParam400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Browse gigs - limit too high (400)" id="86975bcc-57a3-4600-8694-666d7c03c0b3" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.133">
+    <testcase name="Status code is 400" time="0.133" classname="2GigsCrudOwnershipAndValidationBrowseGigsLimitTooHigh400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.133" classname="2GigsCrudOwnershipAndValidationBrowseGigsLimitTooHigh400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Get gig by id (200)" id="9c9c40b1-4f1e-4da3-87b4-81c4a94d18dd" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.345">
+    <testcase name="Status code is 200" time="0.345" classname="2GigsCrudOwnershipAndValidationGetGigById200"/>
+    <testcase name="Success envelope" time="0.345" classname="2GigsCrudOwnershipAndValidationGetGigById200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Get gig - invalid id format (400)" id="bab82ce1-3d89-4d75-bdf0-caa161aa1825" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.080">
+    <testcase name="Status code is 400" time="0.080" classname="2GigsCrudOwnershipAndValidationGetGigInvalidIdFormat400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.080" classname="2GigsCrudOwnershipAndValidationGetGigInvalidIdFormat400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Get gig - non-existent id (404)" id="f3b318b2-05de-435f-a2c2-6a2647aab42c" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.216">
+    <testcase name="Status code is 404" time="0.216" classname="2GigsCrudOwnershipAndValidationGetGigNonExistentId404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.216" classname="2GigsCrudOwnershipAndValidationGetGigNonExistentId404"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / My gigs - freelancer (200)" id="4a13475e-7e4c-4c41-87b1-8565c5564238" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.491">
+    <testcase name="Status code is 200" time="0.491" classname="2GigsCrudOwnershipAndValidationMyGigsFreelancer200"/>
+    <testcase name="Success envelope" time="0.491" classname="2GigsCrudOwnershipAndValidationMyGigsFreelancer200"/>
+    <testcase name="Only own gigs" time="0.491" classname="2GigsCrudOwnershipAndValidationMyGigsFreelancer200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / My gigs - client forbidden (403)" id="5fc974ab-e76a-496f-9911-f20e871bc499" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.100">
+    <testcase name="Status code is 403" time="0.100" classname="2GigsCrudOwnershipAndValidationMyGigsClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.100" classname="2GigsCrudOwnershipAndValidationMyGigsClientForbidden403"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Update own gig (200)" id="42e7894b-9e5d-48ef-ba0c-1b0b11424e46" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.265">
+    <testcase name="Status code is 200" time="0.265" classname="2GigsCrudOwnershipAndValidationUpdateOwnGig200"/>
+    <testcase name="Success envelope" time="0.265" classname="2GigsCrudOwnershipAndValidationUpdateOwnGig200"/>
+    <testcase name="Price updated" time="0.265" classname="2GigsCrudOwnershipAndValidationUpdateOwnGig200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Update gig - empty body (400)" id="25dcc755-9e55-49b2-ba15-27ce1f60ae5e" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.126">
+    <testcase name="Status code is 400" time="0.126" classname="2GigsCrudOwnershipAndValidationUpdateGigEmptyBody400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.126" classname="2GigsCrudOwnershipAndValidationUpdateGigEmptyBody400"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Update gig - another freelancer's gig (404, no IDOR)" id="65ae78b7-2eec-4353-a5f5-9d01d4ce84ea" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.288">
+    <testcase name="Status code is 404" time="0.288" classname="2GigsCrudOwnershipAndValidationUpdateGigAnotherFreelancersGig404NoIdor"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.288" classname="2GigsCrudOwnershipAndValidationUpdateGigAnotherFreelancersGig404NoIdor"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Delete gig - another freelancer's gig (404, no IDOR)" id="01b80b8d-7e91-41b5-83fd-8c6c017342b0" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.243">
+    <testcase name="Status code is 404" time="0.243" classname="2GigsCrudOwnershipAndValidationDeleteGigAnotherFreelancersGig404NoIdor"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.243" classname="2GigsCrudOwnershipAndValidationDeleteGigAnotherFreelancersGig404NoIdor"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Delete gig - client forbidden (403)" id="75c0ffa9-9a83-4c57-b464-cae6a001605b" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.132">
+    <testcase name="Status code is 403" time="0.132" classname="2GigsCrudOwnershipAndValidationDeleteGigClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.132" classname="2GigsCrudOwnershipAndValidationDeleteGigClientForbidden403"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Pause own gig (200)" id="994a927a-1ae0-46ef-a4a3-8faf8ce52e78" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.169">
+    <testcase name="Status code is 200" time="0.169" classname="2GigsCrudOwnershipAndValidationPauseOwnGig200"/>
+    <testcase name="Success envelope" time="0.169" classname="2GigsCrudOwnershipAndValidationPauseOwnGig200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Paused gig hidden from clients (404)" id="935275d0-a374-4468-97c7-ea04d509a163" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.299">
+    <testcase name="Status code is 404" time="0.299" classname="2GigsCrudOwnershipAndValidationPausedGigHiddenFromClients404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.299" classname="2GigsCrudOwnershipAndValidationPausedGigHiddenFromClients404"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Delete own gig (200)" id="3b900040-cec3-403a-98d3-487038163901" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.340">
+    <testcase name="Status code is 200" time="0.340" classname="2GigsCrudOwnershipAndValidationDeleteOwnGig200"/>
+    <testcase name="Success envelope" time="0.340" classname="2GigsCrudOwnershipAndValidationDeleteOwnGig200"/>
+  </testsuite>
+  <testsuite name="2. Gigs - CRUD, ownership and validation / Deleted gig is gone (404)" id="e1cf5674-496c-44b1-8764-21ba09005c65" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.246">
+    <testcase name="Status code is 404" time="0.246" classname="2GigsCrudOwnershipAndValidationDeletedGigIsGone404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.246" classname="2GigsCrudOwnershipAndValidationDeletedGigIsGone404"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - client (201) creates transaction" id="46e589dc-12b3-4c7d-be3c-b43d73843d24" timestamp="2026-10-11T17:29:28.121Z" tests="7" failures="0" errors="0" time="0.406">
+    <testcase name="Status code is 201" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+    <testcase name="Success envelope" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+    <testcase name="Booking linked to client and freelancer" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+    <testcase name="Amount taken from the gig, not the request" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+    <testcase name="Notes sanitised" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+    <testcase name="Transaction recorded for this booking" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+    <testcase name="Fee and earnings add up" time="0.406" classname="3BookingsAndTransactionRecordingCreateBookingClient201CreatesTransaction"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - freelancer forbidden (403)" id="9435b822-2709-40b2-8b57-ff0e4af3e057" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.124">
+    <testcase name="Status code is 403" time="0.124" classname="3BookingsAndTransactionRecordingCreateBookingFreelancerForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.124" classname="3BookingsAndTransactionRecordingCreateBookingFreelancerForbidden403"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - admin forbidden (403)" id="744073d1-a659-4341-8389-d1eed31df875" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.148">
+    <testcase name="Status code is 403" time="0.148" classname="3BookingsAndTransactionRecordingCreateBookingAdminForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.148" classname="3BookingsAndTransactionRecordingCreateBookingAdminForbidden403"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - price tampering rejected (400)" id="601bb587-5405-445f-b893-1370d0711be9" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.153">
+    <testcase name="Status code is 400" time="0.153" classname="3BookingsAndTransactionRecordingCreateBookingPriceTamperingRejected400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.153" classname="3BookingsAndTransactionRecordingCreateBookingPriceTamperingRejected400"/>
+    <testcase name="Message explains the problem" time="0.153" classname="3BookingsAndTransactionRecordingCreateBookingPriceTamperingRejected400"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - missing gigId (400)" id="8799cc25-a37b-4c40-b4d7-5449e333c933" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.140">
+    <testcase name="Status code is 400" time="0.140" classname="3BookingsAndTransactionRecordingCreateBookingMissingGigId400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.140" classname="3BookingsAndTransactionRecordingCreateBookingMissingGigId400"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - deleted gig (404)" id="2e77ae42-aa55-4224-a1c3-7ee93bd79e7c" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.269">
+    <testcase name="Status code is 404" time="0.269" classname="3BookingsAndTransactionRecordingCreateBookingDeletedGig404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.269" classname="3BookingsAndTransactionRecordingCreateBookingDeletedGig404"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Create booking - no token (401)" id="46b01bb2-b896-44e0-bd8f-aeba0d750a50" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="Status code is 401" time="0.007" classname="3BookingsAndTransactionRecordingCreateBookingNoToken401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.007" classname="3BookingsAndTransactionRecordingCreateBookingNoToken401"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / My bookings - client (200)" id="329de75c-db84-414e-858a-af95d0c1eb74" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.333">
+    <testcase name="Status code is 200" time="0.333" classname="3BookingsAndTransactionRecordingMyBookingsClient200"/>
+    <testcase name="Success envelope" time="0.333" classname="3BookingsAndTransactionRecordingMyBookingsClient200"/>
+    <testcase name="Contains the new booking" time="0.333" classname="3BookingsAndTransactionRecordingMyBookingsClient200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / My bookings - freelancer sees bookings received (200)" id="ffa79de0-eaa8-464b-ac2d-187ea4153d9c" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.443">
+    <testcase name="Status code is 200" time="0.443" classname="3BookingsAndTransactionRecordingMyBookingsFreelancerSeesBookingsReceived200"/>
+    <testcase name="Success envelope" time="0.443" classname="3BookingsAndTransactionRecordingMyBookingsFreelancerSeesBookingsReceived200"/>
+    <testcase name="Contains the booking on their gig" time="0.443" classname="3BookingsAndTransactionRecordingMyBookingsFreelancerSeesBookingsReceived200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / My bookings - other freelancer sees none of it (200)" id="51fed2e4-4cdd-4d9b-a436-2f91115315d1" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.209">
+    <testcase name="Status code is 200" time="0.209" classname="3BookingsAndTransactionRecordingMyBookingsOtherFreelancerSeesNoneOfIt200"/>
+    <testcase name="Success envelope" time="0.209" classname="3BookingsAndTransactionRecordingMyBookingsOtherFreelancerSeesNoneOfIt200"/>
+    <testcase name="Does not contain other people's booking" time="0.209" classname="3BookingsAndTransactionRecordingMyBookingsOtherFreelancerSeesNoneOfIt200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Get booking - client owner (200)" id="ce926dce-3a7a-4ca1-98f6-9f023c1dc255" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.481">
+    <testcase name="Status code is 200" time="0.481" classname="3BookingsAndTransactionRecordingGetBookingClientOwner200"/>
+    <testcase name="Success envelope" time="0.481" classname="3BookingsAndTransactionRecordingGetBookingClientOwner200"/>
+    <testcase name="Includes its transaction" time="0.481" classname="3BookingsAndTransactionRecordingGetBookingClientOwner200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Get booking - unrelated freelancer (404, no IDOR)" id="7a6aee8f-69f9-4210-bb2c-6588ed10e09e" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.309">
+    <testcase name="Status code is 404" time="0.309" classname="3BookingsAndTransactionRecordingGetBookingUnrelatedFreelancer404NoIdor"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.309" classname="3BookingsAndTransactionRecordingGetBookingUnrelatedFreelancer404NoIdor"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / All bookings - client forbidden (403)" id="81c8ef74-7c69-4a4d-94d8-ef52fac12873" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.105">
+    <testcase name="Status code is 403" time="0.105" classname="3BookingsAndTransactionRecordingAllBookingsClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.105" classname="3BookingsAndTransactionRecordingAllBookingsClientForbidden403"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / All bookings - admin (200)" id="f4b2cb39-9546-4460-9f9c-b7bd22813f89" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.353">
+    <testcase name="Status code is 200" time="0.353" classname="3BookingsAndTransactionRecordingAllBookingsAdmin200"/>
+    <testcase name="Success envelope" time="0.353" classname="3BookingsAndTransactionRecordingAllBookingsAdmin200"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Complete booking - client forbidden (403)" id="4d307145-56f7-4981-b072-4f7b08e81ee0" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.112">
+    <testcase name="Status code is 403" time="0.112" classname="3BookingsAndTransactionRecordingCompleteBookingClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.112" classname="3BookingsAndTransactionRecordingCompleteBookingClientForbidden403"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Complete booking - other freelancer (404)" id="bc231418-5316-4b72-ad88-81c9566306cf" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.190">
+    <testcase name="Status code is 404" time="0.190" classname="3BookingsAndTransactionRecordingCompleteBookingOtherFreelancer404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.190" classname="3BookingsAndTransactionRecordingCompleteBookingOtherFreelancer404"/>
+  </testsuite>
+  <testsuite name="3. Bookings and transaction recording / Complete booking - owning freelancer (200)" id="d6067753-9020-4631-b1d2-4177bc6d6297" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.187">
+    <testcase name="Status code is 200" time="0.187" classname="3BookingsAndTransactionRecordingCompleteBookingOwningFreelancer200"/>
+    <testcase name="Success envelope" time="0.187" classname="3BookingsAndTransactionRecordingCompleteBookingOwningFreelancer200"/>
+    <testcase name="Status completed" time="0.187" classname="3BookingsAndTransactionRecordingCompleteBookingOwningFreelancer200"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / My transactions - client (200)" id="565fd6ef-780b-433d-8814-928ca6c2e4b4" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.337">
+    <testcase name="Status code is 200" time="0.337" classname="4TransactionsAndIncomeTrackingMyTransactionsClient200"/>
+    <testcase name="Success envelope" time="0.337" classname="4TransactionsAndIncomeTrackingMyTransactionsClient200"/>
+    <testcase name="Contains the booking transaction" time="0.337" classname="4TransactionsAndIncomeTrackingMyTransactionsClient200"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / My transactions - freelancer (200)" id="e45057cb-9eb3-44f2-a528-913b154833a3" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.301">
+    <testcase name="Status code is 200" time="0.301" classname="4TransactionsAndIncomeTrackingMyTransactionsFreelancer200"/>
+    <testcase name="Success envelope" time="0.301" classname="4TransactionsAndIncomeTrackingMyTransactionsFreelancer200"/>
+    <testcase name="All belong to this freelancer" time="0.301" classname="4TransactionsAndIncomeTrackingMyTransactionsFreelancer200"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / My transactions - other freelancer has none (200)" id="de0d0ff7-53c9-49b5-986a-0a19adf6ec7b" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.240">
+    <testcase name="Status code is 200" time="0.240" classname="4TransactionsAndIncomeTrackingMyTransactionsOtherFreelancerHasNone200"/>
+    <testcase name="Success envelope" time="0.240" classname="4TransactionsAndIncomeTrackingMyTransactionsOtherFreelancerHasNone200"/>
+    <testcase name="Empty" time="0.240" classname="4TransactionsAndIncomeTrackingMyTransactionsOtherFreelancerHasNone200"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / Income summary - freelancer (200)" id="a52262a7-3f30-45d3-8e99-80403844d1b6" timestamp="2026-10-11T17:29:28.121Z" tests="4" failures="0" errors="0" time="0.219">
+    <testcase name="Status code is 200" time="0.219" classname="4TransactionsAndIncomeTrackingIncomeSummaryFreelancer200"/>
+    <testcase name="Success envelope" time="0.219" classname="4TransactionsAndIncomeTrackingIncomeSummaryFreelancer200"/>
+    <testcase name="Income matches the booking (R900 gross, 10% fee, R810 net)" time="0.219" classname="4TransactionsAndIncomeTrackingIncomeSummaryFreelancer200"/>
+    <testcase name="Monthly breakdown present" time="0.219" classname="4TransactionsAndIncomeTrackingIncomeSummaryFreelancer200"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / Income summary - client forbidden (403)" id="fb78eb5b-f375-43d6-ab03-edfebcc02db0" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.095">
+    <testcase name="Status code is 403" time="0.095" classname="4TransactionsAndIncomeTrackingIncomeSummaryClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.095" classname="4TransactionsAndIncomeTrackingIncomeSummaryClientForbidden403"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / Income summary - no token (401)" id="ad8e0f40-b828-4339-aba8-af9dfdbc8f9c" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.005">
+    <testcase name="Status code is 401" time="0.005" classname="4TransactionsAndIncomeTrackingIncomeSummaryNoToken401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.005" classname="4TransactionsAndIncomeTrackingIncomeSummaryNoToken401"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / All transactions - admin (200)" id="a840ba6b-6390-41ac-ae58-ddf6d3598fb2" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.460">
+    <testcase name="Status code is 200" time="0.460" classname="4TransactionsAndIncomeTrackingAllTransactionsAdmin200"/>
+    <testcase name="Success envelope" time="0.460" classname="4TransactionsAndIncomeTrackingAllTransactionsAdmin200"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / All transactions - freelancer forbidden (403)" id="83e49f95-3957-43a0-bd9d-b973870d78a4" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.127">
+    <testcase name="Status code is 403" time="0.127" classname="4TransactionsAndIncomeTrackingAllTransactionsFreelancerForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.127" classname="4TransactionsAndIncomeTrackingAllTransactionsFreelancerForbidden403"/>
+  </testsuite>
+  <testsuite name="4. Transactions and income tracking / Transactions are read-only - POST not available (404)" id="a3809fd2-d614-4008-8a60-cdb094163217" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.124">
+    <testcase name="Status code is 404" time="0.124" classname="4TransactionsAndIncomeTrackingTransactionsAreReadOnlyPostNotAvailable404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.124" classname="4TransactionsAndIncomeTrackingTransactionsAreReadOnlyPostNotAvailable404"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Platform stats - admin (200)" id="a26233ab-bfe8-4cfc-adba-882fb5976ccd" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.324">
+    <testcase name="Status code is 200" time="0.324" classname="5AdminCapabilitiesPlatformStatsAdmin200"/>
+    <testcase name="Success envelope" time="0.324" classname="5AdminCapabilitiesPlatformStatsAdmin200"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Users list - admin (200)" id="810a2cde-2106-4ecb-b112-3dfd9c8e753b" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.286">
+    <testcase name="Status code is 200" time="0.286" classname="5AdminCapabilitiesUsersListAdmin200"/>
+    <testcase name="Success envelope" time="0.286" classname="5AdminCapabilitiesUsersListAdmin200"/>
+    <testcase name="Password hash never returned" time="0.286" classname="5AdminCapabilitiesUsersListAdmin200"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Users list - client forbidden (403)" id="93f02ceb-372f-4174-a34a-7ceeefca1564" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.158">
+    <testcase name="Status code is 403" time="0.158" classname="5AdminCapabilitiesUsersListClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.158" classname="5AdminCapabilitiesUsersListClientForbidden403"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Users list - freelancer forbidden (403)" id="ee6d3a58-c136-42a4-9e8d-bc0c1973a64d" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.125">
+    <testcase name="Status code is 403" time="0.125" classname="5AdminCapabilitiesUsersListFreelancerForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.125" classname="5AdminCapabilitiesUsersListFreelancerForbidden403"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Admin removes a gig (moderation) - setup gig" id="84979a03-b52d-44b5-a083-0317147ebe91" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.251">
+    <testcase name="Status code is 201" time="0.251" classname="5AdminCapabilitiesAdminRemovesAGigModerationSetupGig"/>
+    <testcase name="Success envelope" time="0.251" classname="5AdminCapabilitiesAdminRemovesAGigModerationSetupGig"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Admin removes a gig (200)" id="a1f84a54-cc63-4050-b7f7-568e1f1ebdd8" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.368">
+    <testcase name="Status code is 200" time="0.368" classname="5AdminCapabilitiesAdminRemovesAGig200"/>
+    <testcase name="Success envelope" time="0.368" classname="5AdminCapabilitiesAdminRemovesAGig200"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Suspend user - admin (200)" id="68209011-2f5d-4cb1-abf6-f861d8927739" timestamp="2026-10-11T17:29:28.121Z" tests="3" failures="0" errors="0" time="0.357">
+    <testcase name="Status code is 200" time="0.357" classname="5AdminCapabilitiesSuspendUserAdmin200"/>
+    <testcase name="Success envelope" time="0.357" classname="5AdminCapabilitiesSuspendUserAdmin200"/>
+    <testcase name="User inactive" time="0.357" classname="5AdminCapabilitiesSuspendUserAdmin200"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Suspended user's existing token stops working (401)" id="20387ad1-468a-4229-8ade-e97cea9871da" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.105">
+    <testcase name="Status code is 401" time="0.105" classname="5AdminCapabilitiesSuspendedUsersExistingTokenStopsWorking401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.105" classname="5AdminCapabilitiesSuspendedUsersExistingTokenStopsWorking401"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Suspended user cannot log in (401)" id="9ffe6784-4370-4fb4-ace3-5b7b338e1758" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="1.035">
+    <testcase name="Status code is 401" time="1.035" classname="5AdminCapabilitiesSuspendedUserCannotLogIn401"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="1.035" classname="5AdminCapabilitiesSuspendedUserCannotLogIn401"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Suspend user - invalid body (400)" id="4afa1ab9-6573-4697-b580-af12b9b8f1a5" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.154">
+    <testcase name="Status code is 400" time="0.154" classname="5AdminCapabilitiesSuspendUserInvalidBody400"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.154" classname="5AdminCapabilitiesSuspendUserInvalidBody400"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Reactivate user - admin (200)" id="9d134e4f-4c5a-45e6-92ba-2740028f568d" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.367">
+    <testcase name="Status code is 200" time="0.367" classname="5AdminCapabilitiesReactivateUserAdmin200"/>
+    <testcase name="Success envelope" time="0.367" classname="5AdminCapabilitiesReactivateUserAdmin200"/>
+  </testsuite>
+  <testsuite name="5. Admin capabilities / Suspend user - client forbidden (403)" id="86cff862-6346-4fa3-aded-2497c3713067" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.093">
+    <testcase name="Status code is 403" time="0.093" classname="5AdminCapabilitiesSuspendUserClientForbidden403"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.093" classname="5AdminCapabilitiesSuspendUserClientForbidden403"/>
+  </testsuite>
+  <testsuite name="6. Rate limiting (run last) / Rate limit - login brute force" id="68721962-75fb-467a-88db-9ae038a5f242" timestamp="2026-10-11T17:29:28.121Z" tests="4" failures="0" errors="0" time="0.274">
+    <testcase name="Wrong-password attempt 1 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 2 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 3 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 4 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 5 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 6 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 7 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 8 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 9 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Wrong-password attempt 10 returns 401" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Login limiter triggers 429 after repeated failures" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="429 has a clear message and retry time" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Standard RateLimit headers present" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+    <testcase name="Limit reached within the configured window (&lt;= 11 attempts)" time="0.009" classname="6RateLimitingRunLastRateLimitLoginBruteForce"/>
+  </testsuite>
+  <testsuite name="6. Rate limiting (run last) / Rate limit - booking flood" id="5e0112bd-46b7-4249-be74-a809d77369e7" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.370">
+    <testcase name="Booking 1 accepted before the limit" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="Booking 2 accepted before the limit" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="Booking 3 accepted before the limit" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="Booking 4 accepted before the limit" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="Booking 5 accepted before the limit" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="Booking 6 accepted before the limit" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="Booking limiter triggers 429" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+    <testcase name="429 has a clear message and retry time" time="0.094" classname="6RateLimitingRunLastRateLimitBookingFlood"/>
+  </testsuite>
+  <testsuite name="6. Rate limiting (run last) / Unknown route - safe 404" id="8c563b86-52a9-407e-b0c8-b8d77e4c2c7a" timestamp="2026-10-11T17:29:28.121Z" tests="2" failures="0" errors="0" time="0.007">
+    <testcase name="Status code is 404" time="0.007" classname="6RateLimitingRunLastUnknownRouteSafe404"/>
+    <testcase name="Error uses the safe envelope (success=false, message, nothing internal)" time="0.007" classname="6RateLimitingRunLastUnknownRouteSafe404"/>
+  </testsuite>
+</testsuites>
