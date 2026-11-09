@@ -1,0 +1,49 @@
+
+api/scripts/seedAdmin.js
+  16:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  24:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+api/scripts/seedDemo.js
+  27:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  89:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  95:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+api/scripts/signLegacyTransactions.js
+  21:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  27:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+api/scripts/tamperDemo.js
+  30:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+  36:3  warning  Unused eslint-disable directive (no problems were reported from 'no-console')
+
+api/src/controllers/incomeController.js
+  23:5  error  Generic Object Injection Sink  security/detect-object-injection
+
+api/src/middleware/errorMiddleware.js
+  51:1  warning  Unused eslint-disable directive (no problems were reported from 'no-unused-vars')
+
+api/src/server.js
+  16:12  error  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  17:13  error  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+
+api/src/utils/logger.js
+   42:7   error    Generic Object Injection Sink                                                      security/detect-object-injection
+   54:5   error    Generic Object Injection Sink                                                      security/detect-object-injection
+   54:18  error    Generic Object Injection Sink                                                      security/detect-object-injection
+   73:3   warning  Unused eslint-disable directive (no problems were reported from 'no-unused-vars')
+   91:5   error    Found mkdirSync from package "fs" with non literal argument at index 0             security/detect-non-literal-fs-filename
+  118:3   warning  Unused eslint-disable directive (no problems were reported from 'global-require')
+  120:3   warning  Unused eslint-disable directive (no problems were reported from 'global-require')
+
+api/src/validators/bookingValidators.js
+  45:14  error  Unsafe Regular Expression  security/detect-unsafe-regex
+
+api/src/validators/gigValidators.js
+  41:22  error  Unsafe Regular Expression  security/detect-unsafe-regex
+
+api/tests/app.test.js
+  44:23  error  Function Call Object Injection Sink  security/detect-object-injection
+
+✖ 23 problems (10 errors, 13 warnings)
+  0 errors and 13 warnings potentially fixable with the `--fix` option.
+
