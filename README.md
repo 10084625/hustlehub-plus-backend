@@ -723,9 +723,8 @@ Part 2 screenshots (`01` to `14`) remain in `docs/screenshots/`.
 
 ## 21. Demonstration Video
 
-▶️ **Part 3 video:** [ADD THE YOUTUBE LINK HERE](https://youtu.be/)
+▶️ **POE video:** https://youtu.be/26C9MH112Uw
 
-Part 2 video: [https://youtu.be/uqReKYvFHD4](https://youtu.be/uqReKYvFHD4)
 
 The Part 3 video shows: `docker compose up` with healthy containers; registration and login with JWT; gig creation; booking with the receipt and transaction reference; the freelancer's tax dashboard and method panel (changing the age group); account lockout and the real retry time; sign out and the refused token; the admin audit log and the ledger tamper demo; the GitHub Actions run with every job passing; the Semgrep and ESLint results; and the same events in Azure Application Insights (Live Metrics and a Logs query).
 
