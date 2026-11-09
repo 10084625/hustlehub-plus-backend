@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const config = require('./env');
+const logger = require('../utils/logger');
 
 /**
  * Connects to MongoDB.
@@ -16,8 +17,7 @@ mongoose.set('sanitizeFilter', true);
 
 const connectDB = async () => {
   await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 10000 });
-  // eslint-disable-next-line no-console
-  console.log('Connected to MongoDB');
+  logger.info('Connected to MongoDB', { event: 'db.connected' });
 };
 
 module.exports = connectDB;

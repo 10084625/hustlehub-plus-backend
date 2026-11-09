@@ -3,6 +3,18 @@ const { validate } = require('./common');
 const { stripHtml } = require('../utils/sanitize');
 const { GIG_CATEGORIES } = require('../models/Gig');
 
+/**
+ * True when a price has at most two decimal places. Uses split + two simple
+ * patterns instead of /^\d+(\.\d{1,2})?$/, which ESLint's safe-regex rule
+ * reported as a possible ReDoS pattern (static analysis finding fix).
+ */
+const hasAtMostTwoDecimals = (value) => {
+  const parts = String(value).split('.');
+  if (parts.length > 2) return false;
+  const [whole, decimals = ''] = parts;
+  return /^\d{1,7}$/.test(whole) && /^\d{0,2}$/.test(decimals);
+};
+
 const GIG_FIELDS = ['title', 'description', 'category', 'price', 'deliveryDays', 'isActive'];
 
 const idParam = param('id').isMongoId().withMessage('Gig id is not valid.');
@@ -38,7 +50,7 @@ const gigFieldRules = (isUpdate) => {
       .isFloat({ min: 1, max: 1000000 })
       .withMessage('Price must be a number between 1 and 1,000,000.')
       .bail()
-      .custom((v) => /^\d+(\.\d{1,2})?$/.test(String(v)))
+      .custom(hasAtMostTwoDecimals)
       .withMessage('Price may have at most two decimal places.')
       .toFloat(),
     req(body('deliveryDays'), 'Delivery days')

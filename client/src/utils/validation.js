@@ -1,4 +1,17 @@
 /**
+ * True when a price is digits with at most two decimals ("850", "99.5", "10.99").
+ * Uses split + two simple patterns instead of one regex with a nested
+ * optional group, which ESLint's safe-regex rule reported as a possible
+ * ReDoS pattern (static analysis finding fix).
+ */
+export const hasAtMostTwoDecimals = (value) => {
+  const parts = String(value).split('.');
+  if (parts.length > 2) return false;
+  const [whole, decimals = ''] = parts;
+  return /^\d{1,7}$/.test(whole) && /^\d{0,2}$/.test(decimals);
+};
+
+/**
  * Client-side validation. It mirrors the API's rules so people get instant,
  * friendly feedback. It is a convenience only: the API validates everything
  * again and is the real security boundary.
@@ -50,7 +63,7 @@ export function validateGig({ title, description, category, price, deliveryDays 
   const p = Number(price);
   if (price === '' || Number.isNaN(p)) e.price = 'Enter a price in rand.';
   else if (p < 1 || p > 1000000) e.price = 'Price must be between R1 and R1,000,000.';
-  else if (!/^\d+(\.\d{1,2})?$/.test(String(price))) e.price = 'Use at most two decimal places.';
+  else if (!hasAtMostTwoDecimals(price)) e.price = 'Use at most two decimal places.';
 
   const dd = Number(deliveryDays);
   if (deliveryDays === '' || !Number.isInteger(dd) || dd < 1 || dd > 365) e.deliveryDays = 'Enter whole days from 1 to 365.';

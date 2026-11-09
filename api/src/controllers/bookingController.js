@@ -4,6 +4,7 @@ const { Booking } = require('../models/Booking');
 const { Transaction, PLATFORM_FEE_RATE } = require('../models/Transaction');
 const AppError = require('../utils/AppError');
 const { isOwnerOrAdmin, notFound } = require('../utils/ownership');
+const { logEvent } = require('../utils/audit');
 
 const round2 = (n) => Math.round(n * 100) / 100;
 
@@ -29,6 +30,7 @@ const createBooking = async (req, res, next) => {
     if (!gig) return next(notFound('Gig'));
 
     if (gig.freelancer.toString() === req.user.id) {
+      logEvent('warn', 'booking.self_booking_blocked', req, { gig: gig.id });
       return next(new AppError('You cannot book your own gig.', 400));
     }
 
@@ -52,13 +54,26 @@ const createBooking = async (req, res, next) => {
       freelancerEarnings: round2(gig.price - platformFee),
     });
 
+     logEvent('info', 'booking.created', req, { booking: booking.id, gig: gig.id, freelancer: gig.freelancer.toString(), amount: gig.price });
+    logEvent('info', 'transaction.created', req, {
+      reference: transaction.reference,
+      booking: booking.id,
+      amount: transaction.amount,
+      platformFee: transaction.platformFee,
+      freelancerEarnings: transaction.freelancerEarnings,
+      signed: Boolean(transaction.signature),
+    });
+
     return res.status(201).json({
       success: true,
       message: 'Booking confirmed. Payment simulated successfully.',
       data: { booking, transaction },
     });
   } catch (err) {
-    if (booking) await Booking.deleteOne({ _id: booking._id }).catch(() => {});
+    if (booking) {
+      await Booking.deleteOne({ _id: booking._id }).catch(() => {});
+      logEvent('error', 'booking.rolled_back', req, { booking: booking.id, reason: err.message });
+    }
     return next(err);
   }
 };
@@ -124,6 +139,7 @@ const completeBooking = async (req, res, next) => {
       { new: true }
     );
     if (!booking) return next(notFound('Open booking'));
+    logEvent('info', 'booking.completed', req, { booking: booking.id });
     return res.status(200).json({ success: true, message: 'Booking marked as completed.', data: { booking } });
   } catch (err) {
     return next(err);
