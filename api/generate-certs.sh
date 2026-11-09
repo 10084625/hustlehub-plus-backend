@@ -10,7 +10,7 @@ set -e
 CERT_DIR="./certs"
 mkdir -p "$CERT_DIR"
 
-if [ -f "$CERT_DIR/key.pem" ] && [ -f "$CERT_DIR/cert.pem" ]; then
+if [ -f "$CERT_DIR/key.pem" ] && [ -f "$CERT_DIR/cert.pem" ] && grep -q "api" "$CERT_DIR/.san" 2>/dev/null; then
   echo "Certificates already exist in $CERT_DIR - delete them first if you want to regenerate."
   exit 0
 fi
@@ -20,7 +20,10 @@ openssl req -x509 -nodes -days 365 \
   -keyout "$CERT_DIR/key.pem" \
   -out "$CERT_DIR/cert.pem" \
   -subj "/C=ZA/ST=KwaZulu-Natal/L=Durban/O=HustleHubPlus/OU=Dev/CN=localhost" \
-  -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
+  -addext "subjectAltName=DNS:localhost,DNS:api,IP:127.0.0.1"
+# Part 3: "api" is the API container's name in Docker Compose, so the
+# frontend container can verify this certificate when it forwards /api.
+echo "DNS:localhost,DNS:api,IP:127.0.0.1" > "$CERT_DIR/.san"
 
 echo ""
 echo "Self-signed certificate generated:"
