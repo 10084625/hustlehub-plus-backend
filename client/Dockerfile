@@ -5,7 +5,7 @@
 # and forwards /api to the API container over HTTPS.
 
 # ---- 1. Build
-FROM node:22-alpine AS build
+FROM node:26-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts
