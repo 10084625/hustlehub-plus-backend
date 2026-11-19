@@ -805,7 +805,6 @@ The Part 3 video shows: `docker compose up` with healthy containers; registratio
 | Student number | Name |
 |---|---|
 | ST10084625 | Caleb Keanu Naidoo |
-| ST10460086 | Reece Moodley |
-| ST10441678 | Taytem Pillay |
+
 
 <p align="center"><em>INSY7314 · POE Final (Part 3)</em></p>
