@@ -4,13 +4,13 @@
 # copied into a small, locked-down runtime image.
 
 # ---- 1. Production dependencies only (no test tools in the final image)
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 # ---- 2. Runtime
-FROM node:22-alpine AS runtime
+FROM node:26-alpine AS runtime
 ENV NODE_ENV=production \
     PORT=5000 \
     LOG_FORMAT=json \
