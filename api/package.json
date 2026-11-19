@@ -52,7 +52,7 @@
     "newman": "^6.2.1",
     "newman-reporter-htmlextra": "^1.23.1",
     "nodemon": "^3.1.9",
-    "supertest": "^7.0.0"
+    "supertest": "^7.3.2"
   },
   "jest": {
     "testEnvironment": "node",
