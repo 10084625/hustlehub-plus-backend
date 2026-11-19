@@ -13,7 +13,7 @@ COPY . .
 RUN npm run build
 
 # ---- 2. Serve
-FROM nginxinc/nginx-unprivileged:1.28-alpine AS runtime
+FROM nginxinc/nginx-unprivileged:1.31-alpine AS runtime
 USER root
 RUN apk upgrade --no-cache && rm -f /etc/nginx/conf.d/default.conf
 COPY nginx.conf /etc/nginx/conf.d/hustlehub.conf
